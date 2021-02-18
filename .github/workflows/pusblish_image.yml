@@ -1,0 +1,24 @@
+# The workflow will Publish docker image to github package
+# name: Algotrader API
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'Algotrading/**'
+# jobs:
+#   push_to_registry:
+#     name: Publish Docker image to GitHub Packages
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout the repo
+#         uses: actions/checkout@v2
+#       - name: Login docker.pkg.github.com
+#         run: |
+#           touch ~/TOKEN.txt
+#           echo "${{secrets.PUBLISH_PACKAGE}}" > ~/TOKEN.txt
+#           cat ~/TOKEN.txt | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+#       - name: Build and Post image
+#         run: |
+#           docker build  -t docker.pkg.github.com/kriskirla/Algotrading/Algotrading:latest ./Algotrading/
+#           docker push docker.pkg.github.com/kriskirla/Algotrading/Algotrading:latest
