@@ -4,6 +4,12 @@ This is just me having fun.
 
 # Current feature
 
+## Algotrading Development
+
+Built with Django REST with React and containerized with Docker.
+
+## Jupyter
+
 Portfolio_Analyzer
 - Scrape S&P500 holdings
 - Optimize portfolio base on Efficient Frontier weights and available funds
@@ -16,6 +22,12 @@ Stock Momentum
 - Graph for Price, MACD and RSI
 
 # Progress Tracking
+
+## Algotrading Development
+
+Lots of stuff to even list at the moment.
+
+## Jupyter
 
 Portfolio_Analyzer
 - Expanding to more than S&P500 just to see the result
