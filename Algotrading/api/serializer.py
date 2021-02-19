@@ -1,8 +1,14 @@
 from rest_framework  import serializers
-from .models import Room
+from .models import PortfolioAnalyzer
 
-class RoomSerializer(serializers.ModelSerializer):
+class PortfolioAnalyzerSerializer(serializers.ModelSerializer):
+    """ Serialize the PA model """
     class Meta:
-        model = Room
-        fields = ('id', 'code', 'host', 'guest_can_pause',
-                'votes_to_skip',  'created_at')
+        model = PortfolioAnalyzer
+        fields = ('fund', 'sp', 'dow', 'created_at')
+
+class CreatePortfolioSerializer(serializers.ModelSerializer):
+    """ Serialize the Create PA model """
+    class Meta:
+        model = PortfolioAnalyzer
+        fields = ('fund', 'sp', 'dow')

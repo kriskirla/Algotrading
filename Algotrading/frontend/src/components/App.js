@@ -1,15 +1,15 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
+import React from "react";
+import ReactDOM from "react-dom";
+import HomePage from "./HomePage";
+import PortfolioAnalyzer from "./PortfolioAnalyzer";
 
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return <h1>Testing React Code</h1>;
-    }
+function App(props) {
+    return (
+    <div>
+        <HomePage />
+    </div>
+    );
 }
 
 const appDiv = document.getElementById("app");
-render(<App />, appDiv);
+ReactDOM.render(<App name="Kris"/>, appDiv);
