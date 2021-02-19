@@ -5,7 +5,7 @@ import PortfolioAnalyzer from "./PortfolioAnalyzer";
 
 function App(props) {
     return (
-    <div>
+    <div className="center">
         <HomePage />
     </div>
     );
