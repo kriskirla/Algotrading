@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
-import PortfolioAnalyzer from "./PortfolioAnalyzer";
 import { Grid, Button, ButtonGroup, Typography } from '@material-ui/core';
+import PortfolioAnalyzer from "./PortfolioAnalyzer";
 
 export default function HomePage(prop) {
     return (

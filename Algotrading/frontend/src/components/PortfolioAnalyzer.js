@@ -4,36 +4,37 @@ import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
 
-function buttonCreatePortfolio(fund, sp, dow, start_date, end_date) {
-    if (!(sp || dow)) {
-        sp = true;
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            fund: fund,
-            sp: sp,
-            dow: dow,
-            start_date: start_date.toISOString().substring(0, 10),
-            end_date: end_date.toISOString().substring(0, 10)
-        })
-    };
-    console.log(requestOptions);
-    fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
-        response.json()
-    ).then((data) => 
-        console.log(data)
-    );
-}
-
-export default function PortfolioAnalyzer(prop) {
+const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
     const [sp, setSp] = useState(false);
     const [dow, setDow] = useState(false);
-    const [start_date, setStartDate] = React.useState(new Date('2018-01-01'));
-    const [end_date, setEndDate] = React.useState(new Date('2021-01-01'));
+    const [startDate, setStartDate] = useState(new Date('2018-01-01'));
+    const [endDate, setEndDate] = useState(new Date('2021-01-01'));
+    const [result, setResult] = useState(false);
+
+
+    const buttonCreatePortfolio = (fund, sp, dow, startDate, endDate) => {
+        if (!(sp || dow)) {
+            sp = true;
+        }
+    
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fund: fund,
+                sp: sp,
+                dow: dow,
+                start_date: startDate.toISOString().substring(0, 10),
+                end_date: endDate.toISOString().substring(0, 10)
+            })
+        };
+        fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
+            response.json()
+        ).then((data) => 
+            setResult(data)
+        );
+    }
 
     return (
     <Grid container spacing={1}>
@@ -98,7 +99,7 @@ export default function PortfolioAnalyzer(prop) {
                         margin="normal"
                         id="date-picker-inline"
                         label="Start Date of Analysis"
-                        value={start_date}
+                        value={startDate}
                         onChange={(date) => {setStartDate(date)}}
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
@@ -110,7 +111,7 @@ export default function PortfolioAnalyzer(prop) {
                             margin="normal"
                             id="date-picker-inline"
                             label="Start Date of Analysis"
-                            value={end_date}
+                            value={endDate}
                             onChange={(date) => {setEndDate(date)}}
                             KeyboardButtonProps={{
                                 'aria-label': 'change date',
@@ -123,7 +124,7 @@ export default function PortfolioAnalyzer(prop) {
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonCreatePortfolio(fund, sp, dow, start_date, end_date)}
+            onClick={() => buttonCreatePortfolio(fund, sp, dow, startDate, endDate)}
             >
                 Create Portfolio
             </Button>
@@ -138,6 +139,11 @@ export default function PortfolioAnalyzer(prop) {
                 Back
             </Button>
         </Grid>
+        <Grid item xs={12} align="center">
+            {result}
+        </Grid>
     </Grid>
     );
 }
+
+export default PortfolioAnalyzer;
