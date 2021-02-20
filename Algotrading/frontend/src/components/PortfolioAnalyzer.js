@@ -1,32 +1,40 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core'
-import { Link } from "react-router-dom"
+import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Link } from "react-router-dom";
+import DateFnsUtils from '@date-io/date-fns'
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
 
-function buttonCreatePortfolio(fund, sp, dow) {
-    if (!(sp || dow)) {
-        sp = true;
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            fund: fund,
-            sp: sp,
-            dow: dow
-        })
-    };
-    fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
-        response.json()
-    ).then((data) => 
-        console.log(data)
-    );
-}
-
-export default function PortfolioAnalyzer(prop) {
+const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
     const [sp, setSp] = useState(false);
     const [dow, setDow] = useState(false);
+    const [startDate, setStartDate] = useState(new Date('2018-01-01'));
+    const [endDate, setEndDate] = useState(new Date('2021-01-01'));
+    const [result, setResult] = useState(false);
+
+
+    const buttonCreatePortfolio = (fund, sp, dow, startDate, endDate) => {
+        if (!(sp || dow)) {
+            sp = true;
+        }
+    
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                fund: fund,
+                sp: sp,
+                dow: dow,
+                start_date: startDate.toISOString().substring(0, 10),
+                end_date: endDate.toISOString().substring(0, 10)
+            })
+        };
+        fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
+            response.json()
+        ).then((data) => 
+            setResult(data)
+        );
+    }
 
     return (
     <Grid container spacing={1}>
@@ -83,10 +91,40 @@ export default function PortfolioAnalyzer(prop) {
             </FormControl>
         </Grid>
         <Grid item xs={12} align="center">
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Grid container justify="space-around">
+                    <KeyboardDatePicker
+                        variant="inline"
+                        format="yyyy-mm-dd"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="Start Date of Analysis"
+                        value={startDate}
+                        onChange={(date) => {setStartDate(date)}}
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                    />
+                    <KeyboardDatePicker
+                            variant="inline"
+                            format="yyyy-mm-dd"
+                            margin="normal"
+                            id="date-picker-inline"
+                            label="Start Date of Analysis"
+                            value={endDate}
+                            onChange={(date) => {setEndDate(date)}}
+                            KeyboardButtonProps={{
+                                'aria-label': 'change date',
+                        }}
+                    />
+                </Grid>
+            </MuiPickersUtilsProvider>
+        </Grid>
+        <Grid item xs={12} align="center">
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonCreatePortfolio(fund, sp, dow)}
+            onClick={() => buttonCreatePortfolio(fund, sp, dow, startDate, endDate)}
             >
                 Create Portfolio
             </Button>
@@ -101,6 +139,11 @@ export default function PortfolioAnalyzer(prop) {
                 Back
             </Button>
         </Grid>
+        <Grid item xs={12} align="center">
+            {result}
+        </Grid>
     </Grid>
     );
 }
+
+export default PortfolioAnalyzer;
