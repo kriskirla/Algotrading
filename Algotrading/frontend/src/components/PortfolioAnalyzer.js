@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core'
-import { Link } from "react-router-dom"
+import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Link } from "react-router-dom";
+import DateFnsUtils from '@date-io/date-fns'
+import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
 
-function buttonCreatePortfolio(fund, sp, dow) {
+function buttonCreatePortfolio(fund, sp, dow, start_date, end_date) {
     if (!(sp || dow)) {
         sp = true;
     }
@@ -13,9 +15,12 @@ function buttonCreatePortfolio(fund, sp, dow) {
         body: JSON.stringify({
             fund: fund,
             sp: sp,
-            dow: dow
+            dow: dow,
+            start_date: start_date.toISOString().substring(0, 10),
+            end_date: end_date.toISOString().substring(0, 10)
         })
     };
+    console.log(requestOptions);
     fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
         response.json()
     ).then((data) => 
@@ -27,6 +32,8 @@ export default function PortfolioAnalyzer(prop) {
     const [fund, setFund] = useState(10000);
     const [sp, setSp] = useState(false);
     const [dow, setDow] = useState(false);
+    const [start_date, setStartDate] = React.useState(new Date('2018-01-01'));
+    const [end_date, setEndDate] = React.useState(new Date('2021-01-01'));
 
     return (
     <Grid container spacing={1}>
@@ -83,10 +90,40 @@ export default function PortfolioAnalyzer(prop) {
             </FormControl>
         </Grid>
         <Grid item xs={12} align="center">
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Grid container justify="space-around">
+                    <KeyboardDatePicker
+                        variant="inline"
+                        format="yyyy-mm-dd"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="Start Date of Analysis"
+                        value={start_date}
+                        onChange={(date) => {setStartDate(date)}}
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                    />
+                    <KeyboardDatePicker
+                            variant="inline"
+                            format="yyyy-mm-dd"
+                            margin="normal"
+                            id="date-picker-inline"
+                            label="Start Date of Analysis"
+                            value={end_date}
+                            onChange={(date) => {setEndDate(date)}}
+                            KeyboardButtonProps={{
+                                'aria-label': 'change date',
+                        }}
+                    />
+                </Grid>
+            </MuiPickersUtilsProvider>
+        </Grid>
+        <Grid item xs={12} align="center">
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonCreatePortfolio(fund, sp, dow)}
+            onClick={() => buttonCreatePortfolio(fund, sp, dow, start_date, end_date)}
             >
                 Create Portfolio
             </Button>
