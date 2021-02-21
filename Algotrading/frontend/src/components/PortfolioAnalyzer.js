@@ -92,32 +92,30 @@ const PortfolioAnalyzer = () => {
         </Grid>
         <Grid item xs={12} align="center">
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <Grid container justify="space-around">
-                    <KeyboardDatePicker
+                <KeyboardDatePicker
+                    variant="inline"
+                    format="yyyy-mm-dd"
+                    margin="normal"
+                    id="date-picker-inline"
+                    label="Start Date of Analysis"
+                    value={startDate}
+                    onChange={(date) => {setStartDate(date)}}
+                    KeyboardButtonProps={{
+                        'aria-label': 'change date',
+                    }}
+                />
+                <KeyboardDatePicker
                         variant="inline"
                         format="yyyy-mm-dd"
                         margin="normal"
                         id="date-picker-inline"
                         label="Start Date of Analysis"
-                        value={startDate}
-                        onChange={(date) => {setStartDate(date)}}
+                        value={endDate}
+                        onChange={(date) => {setEndDate(date)}}
                         KeyboardButtonProps={{
                             'aria-label': 'change date',
-                        }}
-                    />
-                    <KeyboardDatePicker
-                            variant="inline"
-                            format="yyyy-mm-dd"
-                            margin="normal"
-                            id="date-picker-inline"
-                            label="Start Date of Analysis"
-                            value={endDate}
-                            onChange={(date) => {setEndDate(date)}}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change date',
-                        }}
-                    />
-                </Grid>
+                    }}
+                />
             </MuiPickersUtilsProvider>
         </Grid>
         <Grid item xs={12} align="center">
