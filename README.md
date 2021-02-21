@@ -6,11 +6,12 @@ This is just me having fun.
 
 ## Algotrading Development
 
-Built with Django REST with React and containerized with Docker.
+Built with Django REST with React.
 
 To run:
-```
+``
 cd Algotrading
+pip3 install -r requirement.txt
 python3 manage.py migrate
 python3 manage.py runserver
 ```
