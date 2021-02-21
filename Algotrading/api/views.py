@@ -2,10 +2,9 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import json
 from .models import PortfolioAnalyzer
 from .serializer import PortfolioAnalyzerSerializer, CreatePortfolioSerializer
-from .services import PortfolioAnalyzerService
+from .services import PortfolioAnalyzerService, test
 
 # Create your views here.
 class PortfolioAnalyzerView(generics.ListAPIView):
@@ -41,9 +40,9 @@ class CreatePortfolioView(generics.ListAPIView):
             pa.save()
 
             # Return the portfolio information
-            portfolio = PortfolioAnalyzerService(pa)
+            portfolio = test(pa)
             
-            return Response(json.dumps(portfolio), status=status.HTTP_200_OK)
+            return Response(portfolio, status=status.HTTP_200_OK)
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
