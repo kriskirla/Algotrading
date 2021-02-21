@@ -8,6 +8,19 @@ This is just me having fun.
 
 Built with Django REST with React and containerized with Docker.
 
+To run:
+```
+cd Algotrading
+python3 manage.py migrate
+python3 manage.py runserver
+```
+To run node script:
+```
+cd Algotrading/frontend
+npm install
+npm run dev
+```
+
 ## Jupyter
 
 Portfolio_Analyzer
