@@ -130,7 +130,7 @@ const PortfolioAnalyzer = () => {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
                     variant="inline"
-                    format="yyyy-mm-dd"
+                    format="yyyy-MM-dd"
                     margin="normal"
                     id="date-picker-inline"
                     label="Start Date of Analysis"
@@ -142,7 +142,7 @@ const PortfolioAnalyzer = () => {
                 />
                 <KeyboardDatePicker
                         variant="inline"
-                        format="yyyy-mm-dd"
+                        format="yyyy-MM-dd"
                         margin="normal"
                         id="date-picker-inline"
                         label="Start Date of Analysis"
