@@ -3,7 +3,7 @@ import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, 
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import Loader from 'react-loader-spinner';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, makeStyles } from '@material-ui/core'
 
 const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
@@ -32,16 +32,43 @@ const PortfolioAnalyzer = () => {
 
         fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
             response.json()
-            ).then((data) => 
-                setResult(data)
+        ).then((data) => {
+            let json = JSON.parse(data);
+            setResult(json);
+            console.log(json);
+        }).catch((err) => 
+            console.log(err)
         );
     }
 
-    const LoadResult = (result) => {
-        if (!result) {
-            <h1>testing</h1>// return <Loader type="Circles" color="#00BFFF" height={80} width={80}/>;
-        } else {
-            return result;
+    const createTable = (result) => {
+        if (result) {
+            return (
+            <TableContainer component={Paper}>
+                <Table aria-label="simple table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="right">Ticker</TableCell>
+                            <TableCell align="right">Name</TableCell>
+                            <TableCell align="right">Allocation</TableCell>
+                            <TableCell align="right">Price</TableCell>
+                            <TableCell align="right">Total</TableCell>
+                            <TableCell align="right">Industry</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {Object.keys(result).map((key) => (
+                            <TableRow>
+                                <TableCell>{key}</TableCell>
+                                {result[key].map((row) =>
+                                    <TableCell>{row}</TableCell>
+                                )}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            );
         }
     }
 
@@ -147,7 +174,7 @@ const PortfolioAnalyzer = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {/* {LoadResult(result)} */}
+            {createTable(result)}
         </Grid>
     </Grid>
     );

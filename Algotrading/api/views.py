@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import PortfolioAnalyzer
 from .serializer import PortfolioAnalyzerSerializer, CreatePortfolioSerializer
-from .services import PortfolioAnalyzerService
+from .services import PortfolioAnalyzerService, test
 
 # Create your views here.
 class PortfolioAnalyzerView(generics.ListAPIView):
@@ -40,7 +40,7 @@ class CreatePortfolioView(generics.ListAPIView):
             pa.save()
 
             # Return the portfolio information
-            portfolio = PortfolioAnalyzerService(pa)
+            portfolio = test(pa)
             
             return Response(portfolio, status=status.HTTP_200_OK)
 

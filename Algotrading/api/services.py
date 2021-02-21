@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import requests
+import json
 import yfinance as yf
 #import matplotlib.pyplot as plt
 from datetime import datetime as dt
@@ -8,6 +8,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt import risk_models
 from pypfopt import expected_returns
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+import time
 
 def PortfolioAnalyzerService(pa):
     """ Get portfolio """
@@ -52,26 +53,23 @@ def PortfolioAnalyzerService(pa):
         """ Get information about ticker """
         ticker = yf.Ticker(symbol)
         return ticker.info
-    
-    company_name = []
-    industry = []
-    share_price = []
-    total_price = []
+
+    result = {}
 
     for symbol in allocation:
         info = get_company_information(symbol)
-        company_name.append(info['longName'])
-        industry.append(info['industry'])
-        share_price.append(info['regularMarketPrice'])
-        total_price.append("${:.2f}".format(info['regularMarketPrice'] * allocation[symbol]))
+        result[symbol] = [
+            info['longName'],
+            int(allocation[symbol]),
+            info['regularMarketPrice'],
+            "${:.2f}".format(info['regularMarketPrice'] * allocation[symbol]),
+            info['industry']
+        ]
+    
+    print(result)
 
-    # Setup the portfolio view
-    portfolio_df = pd.DataFrame(columns=["Ticker", "Name", "Allocation", "Price/Share", "Total", "Industry"])
-    portfolio_df["Ticker"] = allocation.keys()
-    portfolio_df["Name"] = company_name
-    portfolio_df["Allocation"] = allocation.values()
-    portfolio_df["Price/Share"] = share_price
-    portfolio_df["Total"] = total_price
-    portfolio_df["Industry"] = industry
+    return json.dumps(result)
 
-    return portfolio_df.to_json()
+def test(pa):
+    time.sleep(2)
+    return json.dumps({'AMD': ['Advanced Micro Devices, Inc.', 8, 89.75, '$718.00', 'Semiconductors'], 'CARR': ['Carrier Global Corporation', 113, 37, '$4181.00', 'Building Products & Equipment'], 'CLX': ['The Clorox Company', 6, 191.47, '$1148.82', 'Household & Personal Products'], 'DPZ': ["Domino's Pizza, Inc.", 2, 378.08, '$756.16', 'Restaurants'], 'DXCM': ['DexCom, Inc.', 1, 411.86, '$411.86', 'Diagnostics & Research'], 'ENPH': ['Enphase Energy, Inc.', 13, 185.02, '$2405.26', 'Solar'], 'NWL': ['Newell Brands Inc.', 1, 23.85, '$23.85', 'Household & Personal Products'], 'TGT': ['Target Corporation', 2, 191.95, '$383.90', 'Discount Stores']})
