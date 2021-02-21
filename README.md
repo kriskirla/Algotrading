@@ -9,7 +9,7 @@ This is just me having fun.
 Built with Django REST with React.
 
 To run:
-``
+```
 cd Algotrading
 pip3 install -r requirement.txt
 python3 manage.py migrate
