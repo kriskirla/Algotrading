@@ -48,12 +48,12 @@ const PortfolioAnalyzer = () => {
                 <Table aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="right">Ticker</TableCell>
-                            <TableCell align="right">Name</TableCell>
-                            <TableCell align="right">Allocation</TableCell>
-                            <TableCell align="right">Price</TableCell>
-                            <TableCell align="right">Total</TableCell>
-                            <TableCell align="right">Industry</TableCell>
+                            <TableCell align="center">Ticker</TableCell>
+                            <TableCell align="center">Name</TableCell>
+                            <TableCell align="center">Allocation</TableCell>
+                            <TableCell align="center">Price</TableCell>
+                            <TableCell align="center">Total</TableCell>
+                            <TableCell align="center">Industry</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -61,7 +61,7 @@ const PortfolioAnalyzer = () => {
                             <TableRow>
                                 <TableCell>{key}</TableCell>
                                 {result[key].map((row) =>
-                                    <TableCell>{row}</TableCell>
+                                    <TableCell align="center">{row}</TableCell>
                                 )}
                             </TableRow>
                         ))}
@@ -130,7 +130,7 @@ const PortfolioAnalyzer = () => {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <KeyboardDatePicker
                     variant="inline"
-                    format="yyyy-mm-dd"
+                    format="yyyy-MM-dd"
                     margin="normal"
                     id="date-picker-inline"
                     label="Start Date of Analysis"
@@ -142,10 +142,10 @@ const PortfolioAnalyzer = () => {
                 />
                 <KeyboardDatePicker
                         variant="inline"
-                        format="yyyy-mm-dd"
+                        format="yyyy-MM-dd"
                         margin="normal"
                         id="date-picker-inline"
-                        label="Start Date of Analysis"
+                        label="End Date of Analysis"
                         value={endDate}
                         onChange={(date) => {setEndDate(date)}}
                         KeyboardButtonProps={{
