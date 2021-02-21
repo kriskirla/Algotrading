@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
-import { MuiPickersUtilsProvider, KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import Loader from 'react-loader-spinner';
 
 const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
@@ -11,7 +12,6 @@ const PortfolioAnalyzer = () => {
     const [startDate, setStartDate] = useState(new Date('2018-01-01'));
     const [endDate, setEndDate] = useState(new Date('2021-01-01'));
     const [result, setResult] = useState(false);
-
 
     const buttonCreatePortfolio = (fund, sp, dow, startDate, endDate) => {
         if (!(sp || dow)) {
@@ -29,11 +29,20 @@ const PortfolioAnalyzer = () => {
                 end_date: endDate.toISOString().substring(0, 10)
             })
         };
+
         fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
             response.json()
-        ).then((data) => 
-            setResult(data)
+            ).then((data) => 
+                setResult(data)
         );
+    }
+
+    const LoadResult = (result) => {
+        if (!result) {
+            <h1>testing</h1>// return <Loader type="Circles" color="#00BFFF" height={80} width={80}/>;
+        } else {
+            return result;
+        }
     }
 
     return (
@@ -138,7 +147,7 @@ const PortfolioAnalyzer = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {result}
+            {/* {LoadResult(result)} */}
         </Grid>
     </Grid>
     );
