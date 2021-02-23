@@ -2,6 +2,8 @@
 
 This is just me having fun.
 
+Progress on [youtube](https://youtube.com/playlist?list=PL31_Qju7bSIt-G1pozcT-vbPcmgqUYT5v)
+
 # Current feature
 
 ## Algotrading Development
