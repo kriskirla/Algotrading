@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 import { Grid, Button, ButtonGroup, Typography } from '@material-ui/core';
 import PortfolioAnalyzer from "./PortfolioAnalyzer";
+import StockForecastSVM from "./StockForecastSVM"
 
 export default function HomePage(prop) {
     return (
@@ -11,6 +12,7 @@ export default function HomePage(prop) {
                 {renderHomePage()}
             </Route>
             <Route exact path='/portfolioanalyzer' component={PortfolioAnalyzer} />
+            <Route exact path='/svmforecast' component={StockForecastSVM} />
         </Switch>
     </Router>
     );
@@ -30,8 +32,8 @@ function renderHomePage() {
                 </Button>
             </Grid>
             <Grid item xs={12} align="center">
-                <Button color="primary" variant="contained" to="/portfolioview" component={ Link }>
-                    Change this
+                <Button color="primary" variant="contained" to="/svmforecast" component={ Link }>
+                    Stock Forecast (SVM)
                 </Button>
             </Grid>
         </Grid>
