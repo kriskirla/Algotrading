@@ -12,8 +12,14 @@ To run:
 ```
 cd Algotrading
 pip3 install -r requirement.txt
+python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver
+```
+For wsgi:
+```
+cd Algotrading
+gunicorn Algotrading.wsgi
 ```
 To run node script:
 ```
