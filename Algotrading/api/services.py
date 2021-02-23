@@ -9,6 +9,7 @@ from pypfopt import risk_models
 from pypfopt import expected_returns
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 import time
+from sklearn.svm import SVR
 
 def PortfolioAnalyzerService(pa):
     """ Get portfolio """
@@ -68,8 +69,89 @@ def PortfolioAnalyzerService(pa):
     
     print(result)
 
-    return json.dumps(result)
+    return result
 
 def test(pa):
     time.sleep(2)
-    return json.dumps({'AMD': ['Advanced Micro Devices, Inc.', 8, 89.75, '$718.00', 'Semiconductors'], 'CARR': ['Carrier Global Corporation', 113, 37, '$4181.00', 'Building Products & Equipment'], 'CLX': ['The Clorox Company', 6, 191.47, '$1148.82', 'Household & Personal Products'], 'DPZ': ["Domino's Pizza, Inc.", 2, 378.08, '$756.16', 'Restaurants'], 'DXCM': ['DexCom, Inc.', 1, 411.86, '$411.86', 'Diagnostics & Research'], 'ENPH': ['Enphase Energy, Inc.', 13, 185.02, '$2405.26', 'Solar'], 'NWL': ['Newell Brands Inc.', 1, 23.85, '$23.85', 'Household & Personal Products'], 'TGT': ['Target Corporation', 2, 191.95, '$383.90', 'Discount Stores']})
+    return {'AMD': ['Advanced Micro Devices, Inc.', 8, 89.75, '$718.00', 'Semiconductors'], 'CARR': ['Carrier Global Corporation', 113, 37, '$4181.00', 'Building Products & Equipment'], 'CLX': ['The Clorox Company', 6, 191.47, '$1148.82', 'Household & Personal Products'], 'DPZ': ["Domino's Pizza, Inc.", 2, 378.08, '$756.16', 'Restaurants'], 'DXCM': ['DexCom, Inc.', 1, 411.86, '$411.86', 'Diagnostics & Research'], 'ENPH': ['Enphase Energy, Inc.', 13, 185.02, '$2405.26', 'Solar'], 'NWL': ['Newell Brands Inc.', 1, 23.85, '$23.85', 'Household & Personal Products'], 'TGT': ['Target Corporation', 2, 191.95, '$383.90', 'Discount Stores']}
+
+def StockTestSVMService(pa):
+    """ Get the forecast for the ticker using SVM models """
+    ticker = pa.ticker
+    year = pa.year
+
+    # Get data from yahoo finance
+    df = yf.download(ticker, start=year, end=dt.today().strftime('%Y-%m-%d'))
+
+    # Create independant dataset and dependant dataset
+    df_days = df.index
+    df_adj_close = df.loc[:, 'Adj Close']
+
+    days = [[i.dayofyear] for i in df_days ]
+    adj_close_price = [float(price) for price in df_adj_close]
+
+    # Linear Model
+    lin_svr = SVR(kernel='linear', C=1000)
+    lin_svr.fit(days, adj_close_price)
+    lin_predict = lin_svr.predict(days)
+    # Polynomial Model
+    poly_svr = SVR(kernel='poly', C=1000, degree=2)
+    poly_svr.fit(days, adj_close_price)
+    poly_predict = poly_svr.predict(days)
+    # Radial Basis Function Model
+    rbf_svr = SVR(kernel='rbf', C=1000, gamma=0.85)
+    rbf_svr.fit(days, adj_close_price)
+    rbf_predict = rbf_svr.predict(days)
+
+    result = {}
+
+    for i in range(0, len(df.index)):
+        result[str(df.index[i])] = [
+            adj_close_price[i],
+            lin_predict[i],
+            poly_predict[i],
+            rbf_predict[i]
+        ]
+
+    return result
+
+def StockForecastSVMService(pa):
+    """ Get the forecast for the ticker using SVM models """
+    ticker = pa.ticker
+    year = pa.year
+
+    # Get data from yahoo finance
+    df = yf.download(ticker, start=year, end=dt.today().strftime('%Y-%m-%d'))
+
+    # Create independant dataset and dependant dataset
+    df_days = df.index
+    df_adj_close = df.loc[:, 'Adj Close']
+
+    days = [[i.dayofyear] for i in df_days ]
+    adj_close_price = [float(price) for price in df_adj_close]
+
+    # Linear Model
+    lin_svr = SVR(kernel='linear', C=1000)
+    lin_svr.fit(days, adj_close_price)
+    # Polynomial Model
+    poly_svr = SVR(kernel='poly', C=1000, degree=2)
+    poly_svr.fit(days, adj_close_price)
+    # Radial Basis Function Model
+    rbf_svr = SVR(kernel='rbf', C=1000, gamma=0.85)
+    rbf_svr.fit(days, adj_close_price)
+
+    result = {}
+
+    # Test the predicted price for the next n days
+    n = 3
+
+    for i in range(1, n + 1):
+        day = [[days[-1][0] + i]]
+        date = dt.strptime('{} {}'.format(days[-1][0] + i, df_days.year[0]),'%j %Y').strftime('%Y-%m-%d %H:%M:%S')
+        result[str(date)] = [
+            float(lin_svr.predict(day)),
+            float(poly_svr.predict(day)),
+            float(rbf_svr.predict(day))
+        ]
+
+    return result

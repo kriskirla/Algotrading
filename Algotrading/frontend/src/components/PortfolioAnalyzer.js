@@ -9,8 +9,8 @@ const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
     const [sp, setSp] = useState(false);
     const [dow, setDow] = useState(false);
-    const [startDate, setStartDate] = useState(new Date('2018-01-01'));
-    const [endDate, setEndDate] = useState(new Date('2021-01-01'));
+    const [startDate, setStartDate] = useState(new Date('2018-01-01T00:00:00'));
+    const [endDate, setEndDate] = useState(new Date('2021-01-01T00:00:00'));
     const [result, setResult] = useState(false);
 
     const buttonCreatePortfolio = (fund, sp, dow, startDate, endDate) => {
@@ -33,6 +33,7 @@ const PortfolioAnalyzer = () => {
         fetch("/api/portfolioanalyzer", requestOptions).then((response) => 
             response.json()
         ).then((data) => {
+            // Need to parse because it contains list as values
             let json = JSON.parse(data);
             setResult(json);
             console.log(json);
@@ -116,7 +117,7 @@ const PortfolioAnalyzer = () => {
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                defaultValue="10000"
+                defaultValue={fund}
                 onChange={(e) => setFund(e.target.value)}
                 />
                 <FormHelperText>

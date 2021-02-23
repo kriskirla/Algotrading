@@ -12,3 +12,9 @@ class PortfolioAnalyzer(models.Model):
     start_date = models.DateField(default=datetime.date.today, verbose_name='Start Period')
     end_date = models.DateField(default=datetime.date.today, verbose_name='End Period')
     created_at = models.DateTimeField(auto_now_add=True)
+
+class StockForecastSVM(models.Model):
+    """ Create the Stock Forecast SVM object """
+    ticker = models.CharField(max_length=20)
+    year = models.DateField(default=datetime.date.today, verbose_name='Analyzing Year')
+    created_at = models.DateTimeField(auto_now_add=True)
