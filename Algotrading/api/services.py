@@ -18,19 +18,28 @@ def PortfolioAnalyzerService(pa):
     end_date = pa.end_date
     fund = pa.fund
 
-    # Tickers to track S&P500
-    payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-    first_table = payload[0]
-    second_table = payload[1]
+    # Getting all tickers
+    ticker = set()
 
-    df = first_table
-    ticker = df['Symbol'].values.tolist()
+    # Tickers to track S&P500
+    if (pa.sp):
+        payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+        first_table = payload[0]
+        second_table = payload[1]
+
+        df = first_table
+        ticker = ticker.union(set(df['Symbol'].values))
+    if (pa.nasdaq):
+        payload = pd.read_html('https://en.wikipedia.org/wiki/NASDAQ-100%23External_links')
+        first_table = payload[3]
+
+        df = first_table
+        ticker = ticker.union(set(df['Ticker'].values))
 
     # Get data from yahoo finance
     df = yf.download(ticker, start=start_date, end=end_date)['Close']
     # Drop all delisted tickers
     df = df.dropna(axis='columns', how='all')
-    df = df.drop(columns=["WRK"]) # For some reason WRK is showing Na for all except latest
 
     # Calculate the expected annualized returns and the annualized sample covariance matrix of the daily asset returns
     mu = expected_returns.mean_historical_return(df)
