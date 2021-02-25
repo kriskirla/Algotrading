@@ -8,13 +8,13 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
     const [sp, setSp] = useState(false);
-    const [dow, setDow] = useState(false);
+    const [nasdaq, setNasdaq] = useState(false);
     const [startDate, setStartDate] = useState(new Date('2018-01-01T00:00:00'));
-    const [endDate, setEndDate] = useState(new Date('2021-01-01T00:00:00'));
+    const [endDate, setEndDate] = useState(new Date());
     const [result, setResult] = useState(false);
 
-    const buttonCreatePortfolio = (fund, sp, dow, startDate, endDate) => {
-        if (!(sp || dow)) {
+    const buttonCreatePortfolio = (fund, sp, nasdaq, startDate, endDate) => {
+        if (!(sp || nasdaq)) {
             sp = true;
         }
     
@@ -24,7 +24,7 @@ const PortfolioAnalyzer = () => {
             body: JSON.stringify({
                 fund: fund,
                 sp: sp,
-                dow: dow,
+                nasdaq: nasdaq,
                 start_date: startDate.toISOString().substring(0, 10),
                 end_date: endDate.toISOString().substring(0, 10)
             })
@@ -45,8 +45,8 @@ const PortfolioAnalyzer = () => {
     const createTable = (result) => {
         if (result) {
             return (
-            <TableContainer component={Paper}>
-                <Table aria-label="simple table">
+            <TableContainer component={Paper} style={{maxHeight: 350}}>
+                <Table aria-label="simple table" stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell align="center">Ticker</TableCell>
@@ -100,9 +100,9 @@ const PortfolioAnalyzer = () => {
                     />
                     <FormControlLabel 
                     control={<Checkbox color="primary"/>} 
-                    label="DOW" 
+                    label="Nasdaq-100" 
                     labelPlacement="start" 
-                    onChange={() => setDow(!dow)} 
+                    onChange={() => setNasdaq(!nasdaq)} 
                     />
                 </FormGroup>
             </FormControl>
@@ -159,7 +159,7 @@ const PortfolioAnalyzer = () => {
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonCreatePortfolio(fund, sp, dow, startDate, endDate)}
+            onClick={() => buttonCreatePortfolio(fund, sp, nasdaq, startDate, endDate)}
             >
                 Create Portfolio
             </Button>
