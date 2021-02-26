@@ -11,6 +11,13 @@ Progress on [youtube](https://youtube.com/playlist?list=PL31_Qju7bSIt-G1pozcT-vb
 Built with Django REST with React.
 
 To run:
+With Docker:
+```
+docker-compose up
+```
+After build is completed, navigate to http://0.0.0.0:8000
+
+Locally Testing:
 ```
 cd Algotrading
 pip3 install -r requirement.txt
