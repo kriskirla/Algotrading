@@ -5,4 +5,5 @@ urlpatterns = [
     path('', index),
     path('portfolioanalyzer', index),
     path('svmforecast', index),
+    path('sentimentanalysis', index),
 ]

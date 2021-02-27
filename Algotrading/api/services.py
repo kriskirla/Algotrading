@@ -10,6 +10,11 @@ from pypfopt import expected_returns
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 import time
 from sklearn.svm import SVR
+import nltk
+nltk.downloader.download('vader_lexicon')
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from urllib.request import urlopen, Request
+from bs4 import BeautifulSoup
 
 def PortfolioAnalyzerService(pa):
     """ Get portfolio """
@@ -162,5 +167,83 @@ def StockForecastSVMService(pa):
             float(poly_svr.predict(day)),
             float(rbf_svr.predict(day))
         ]
+
+    return result
+
+def SentimentAnalysisService(pa):
+    source = 'https://finviz.com/quote.ashx?t='
+    ticker = pa.ticker
+    day = pa.day
+
+    news_tables = {}
+    url = source + ticker
+    req = Request(url=url,headers={'user-agent': 'my-app/0.0.1'}) 
+    response = urlopen(req)    
+    # Read the contents of the file into 'html'
+    html = BeautifulSoup(response)
+    # Find 'news-table' in the Soup and load it into 'news_table'
+    news_table = html.find(id='news-table')
+    # Add the table to our dictionary
+    news_tables[ticker] = news_table
+
+    # Parse the news
+    parsed_news = []
+
+    # Iterate through the news
+    for file_name, news_table in news_tables.items():
+        ticker = file_name.split('_')[0]
+        count = 0
+        # Iterate through all tr tags
+        for tr in news_table.findAll('tr'):
+            # The first tag contains date
+            if len(tr.td.text.split()) > 1:
+                date = tr.td.text.split()[0]
+                time = tr.td.text.split()[1]
+                count += 1
+            else:
+                time = tr.td.text.split()[0]
+
+            if count <= day:
+                parsed_news.append([file_name, date, time, tr.a.get_text(), tr.a.attrs['href']])
+            else:
+                break
+    
+    # Instantiate the sentiment intensity analyzer
+    vader = SentimentIntensityAnalyzer()
+
+    df = pd.DataFrame(parsed_news, columns=['Ticker', 'Date', 'Time', 'Headline', 'URL'])
+    # Apply Vader sentiment analysis to headlines
+    scores = df['Headline'].apply(vader.polarity_scores).tolist()
+    scores_df = pd.DataFrame(scores)
+    df = df.join(scores_df, rsuffix='_right')
+    df['Date'] = pd.to_datetime(df['Date']).dt.date
+    df.set_index('Date', inplace=True)
+
+    # Group the scores by ticker and date
+    mean_scores = df.groupby(['Ticker', 'Date']).mean()
+    mean_scores = mean_scores.unstack()
+    mean_scores = mean_scores.xs('compound', axis="columns").transpose()
+
+    table = []
+    mean_table = []
+
+    for i in range(0, len(df.index)):
+        table.append([
+            f"{df.index[i]} {df['Time'][i]}",
+            df['Headline'][i],
+            df['neg'][i],
+            df['neu'][i],
+            df['pos'][i],
+            df['compound'][i],
+            df['URL'][i],
+        ])
+    
+    for i in range(0, len(mean_scores.index)):
+        mean_table.append([
+            str(mean_scores.index[i]),
+            mean_scores[ticker][i]
+        ])
+    
+    result = {'Table': table, 'Mean': mean_table}
 
     return result
