@@ -7,7 +7,7 @@ import CanvasJSReact from '../canvasjs.react';
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StockForecastSVM = () => {
-    const [ticker, setFund] = useState('MSFT');
+    const [ticker, setTicker] = useState('MSFT');
     const [year, setYear] = useState(new Date('2021-01-01T00:00:00'));
     const [result, setResult] = useState(false);
     const [displaySwitch, flipSwitch] = useState(false);
@@ -209,7 +209,7 @@ const StockForecastSVM = () => {
                     style: {textAlign: "center"}
                 }}
                 defaultValue={ticker}
-                onChange={(e) => setFund(e.target.value)}
+                onChange={(e) => setTicker(e.target.value)}
                 />
                 <FormHelperText>
                     <div align="center">
