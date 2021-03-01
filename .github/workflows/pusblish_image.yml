@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - nonm1mac
     paths:
       - 'Algotrading/**'
 jobs:
