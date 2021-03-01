@@ -25,6 +25,7 @@ jobs:
         with:
           push: true
           tags: kriskirla/algotrading:latest
+          file: ./Algotrading/Dockerfile
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Push to GitHub Packages
