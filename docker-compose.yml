@@ -9,7 +9,7 @@ services:
     #     - POSTGRES_PASSWORD=postgres
     django:
         # build: ./Algotrading
-        image: kriskirla/algotrading
+        image: docker.pkg.github.com/kriskirla/algotrading/algotrading:latest
         volumes:
         - ./Algotrading:/app
         ports:
