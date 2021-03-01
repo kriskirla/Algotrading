@@ -12,7 +12,7 @@ Built with Django REST with React.
 
 ### To run with Docker
 ```python
-# This will automatically pull from Dockerhub kriskirla/algotrading
+# This will automatically pull image from Github Package
 docker-compose up
 ```
 After build is completed, navigate to http://0.0.0.0:8000
