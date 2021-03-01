@@ -24,3 +24,13 @@ class SentimentAnalysis(models.Model):
     ticker = models.CharField(max_length=20)
     day = models.IntegerField(default=datetime.date.today, verbose_name='Days To Read')
     created_at = models.DateTimeField(auto_now_add=True)
+
+class IntrinsicValuation(models.Model):
+    """ Create the Intrinsic Valuation object """
+    ticker = models.CharField(max_length=20)
+    discount_rate = models.FloatField(help_text="i.e. 0.1")
+    pe = models.FloatField(help_text="i.e. 33.86")
+    eps = models.FloatField(help_text="i.e. 50.45")
+    growth_one_year = models.FloatField(help_text="i.e. 0.1")
+    growth_five_years = models.FloatField(help_text="i.e. 0.1")
+    created_at = models.DateTimeField(auto_now_add=True)

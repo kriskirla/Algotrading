@@ -15,26 +15,27 @@ nltk.downloader.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
+import yahoo_fin.stock_info as si
 
-def PortfolioAnalyzerService(pa):
+def PortfolioAnalyzerService(model):
     """ Get portfolio """
     # Settings from input
-    start_date = pa.start_date
-    end_date = pa.end_date
-    fund = pa.fund
+    start_date = model.start_date
+    end_date = model.end_date
+    fund = model.fund
 
     # Getting all tickers
     ticker = set()
 
     # Tickers to track S&P500
-    if (pa.sp):
+    if (model.sp):
         payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
         first_table = payload[0]
         second_table = payload[1]
 
         df = first_table
         ticker = ticker.union(set(df['Symbol'].values))
-    if (pa.nasdaq):
+    if (model.nasdaq):
         payload = pd.read_html('https://en.wikipedia.org/wiki/NASDAQ-100%23External_links')
         first_table = payload[3]
 
@@ -85,14 +86,14 @@ def PortfolioAnalyzerService(pa):
 
     return result
 
-def test(pa):
+def test(model):
     time.sleep(2)
     return {'AMD': ['Advanced Micro Devices, Inc.', 8, 89.75, '$718.00', 'Semiconductors'], 'CARR': ['Carrier Global Corporation', 113, 37, '$4181.00', 'Building Products & Equipment'], 'CLX': ['The Clorox Company', 6, 191.47, '$1148.82', 'Household & Personal Products'], 'DPZ': ["Domino's Pizza, Inc.", 2, 378.08, '$756.16', 'Restaurants'], 'DXCM': ['DexCom, Inc.', 1, 411.86, '$411.86', 'Diagnostics & Research'], 'ENPH': ['Enphase Energy, Inc.', 13, 185.02, '$2405.26', 'Solar'], 'NWL': ['Newell Brands Inc.', 1, 23.85, '$23.85', 'Household & Personal Products'], 'TGT': ['Target Corporation', 2, 191.95, '$383.90', 'Discount Stores']}
 
-def StockTestSVMService(pa):
+def StockTestSVMService(model):
     """ Get the forecast for the ticker using SVM models """
-    ticker = pa.ticker
-    year = pa.year
+    ticker = model.ticker
+    year = model.year
 
     # Get data from yahoo finance
     df = yf.download(ticker, start=year, end=dt.today().strftime('%Y-%m-%d'))
@@ -129,10 +130,10 @@ def StockTestSVMService(pa):
 
     return result
 
-def StockForecastSVMService(pa):
+def StockForecastSVMService(model):
     """ Get the forecast for the ticker using SVM models """
-    ticker = pa.ticker
-    year = pa.year
+    ticker = model.ticker
+    year = model.year
 
     # Get data from yahoo finance
     df = yf.download(ticker, start=year, end=dt.today().strftime('%Y-%m-%d'))
@@ -170,10 +171,10 @@ def StockForecastSVMService(pa):
 
     return result
 
-def SentimentAnalysisService(pa):
+def SentimentAnalysisService(model):
     source = 'https://finviz.com/quote.ashx?t='
-    ticker = pa.ticker
-    day = pa.day
+    ticker = model.ticker
+    day = model.day
 
     news_tables = {}
     url = source + ticker
@@ -245,5 +246,47 @@ def SentimentAnalysisService(pa):
         ])
     
     result = {'Table': table, 'Mean': mean_table}
+
+    return result
+
+def IntrinsicValuationService(model):
+    ticker = model.ticker
+    discount_rate = model.discount_rate
+    pe = model.pe
+    eps = model.eps
+    growth_one_year = model.growth_one_year
+    growth_five_years = model.growth_five_years
+    print(pe, eps, growth_one_year, growth_five_years)
+    # Intrinsic value with P/E ratio, EPS, and expected Growth (Only works with Blue Chip)
+    # http://theautomatic.net/yahoo_fin-documentation/#get_analysts_info
+    try:
+        # Actual Price
+        actual = si.get_live_price(ticker)
+        # Find Fair Price
+        quote = si.get_quote_table(ticker)
+        pe = quote['PE Ratio (TTM)'] if pe == 0 else pe
+        eps = quote['EPS (TTM)'] if eps == 0 else eps
+        # Expected growth of next year
+        analysis = si.get_analysts_info(ticker)
+        growth_one_year = (1 + float(analysis['Growth Estimates'][ticker][3][:-1])/100) if growth_one_year == 0 else growth_one_year
+        growth_five_years = (1 + float(analysis['Growth Estimates'][ticker][4][:-1])/100) if growth_five_years == 0 else growth_five_years
+    except:
+        return {'Bad Request': 'Missing P/E Ratio, EPS (TTM) data, or Growth analytics'}
+    
+    # Calculate fair price, upper, and lower bound
+    fair = (pe * eps * growth_one_year) / discount_rate
+    upper = fair * (1.1)
+    lower = fair * (0.9)
+    in5years = pe * eps * growth_five_years
+    
+    result = {
+        'PE_EPS_Model': [
+            float("{:.2f}".format(actual)),
+            float("{:.2f}".format(fair)),
+            float("{:.2f}".format(upper)),
+            float("{:.2f}".format(lower)),
+            float("{:.2f}".format(in5years))
+        ]
+    }
 
     return result
