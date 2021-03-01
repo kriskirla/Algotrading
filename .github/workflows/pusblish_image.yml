@@ -12,11 +12,8 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Login to Github
-        uses: docker/login-action@v1
-        with:
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Login to GitHub Package Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u "${{ github.actor }}" --password-stdin
       - name: Build container image
         run: |
           docker build  -t docker.pkg.github.com/kriskirla/Algotrading:latest ./Algotrading
