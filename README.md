@@ -2,11 +2,11 @@
 
 This is just me having fun.
 
-Progress on [youtube](https://youtube.com/playlist?list=PL31_Qju7bSIt-G1pozcT-vbPcmgqUYT5v)
-
 # Current feature
 
-## Algotrading Development
+Progress on [youtube](https://youtube.com/playlist?list=PL31_Qju7bSIt-G1pozcT-vbPcmgqUYT5v)
+
+## Setting up
 
 Built with Django REST with React.
 
@@ -49,3 +49,9 @@ Stock Forecast
 Stock Momentum
 - ML Model using decision tree classifier to termine the target
 - Graph for Price, MACD and RSI
+
+Sentiment Analysis
+- Uses VADER to scrape headlines on finviz to determine if a stock is receiving good/bad news
+
+Stock Intrinsic Value
+- Still in progress
