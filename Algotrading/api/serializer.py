@@ -1,5 +1,5 @@
 from rest_framework  import serializers
-from .models import PortfolioAnalyzer, StockForecastSVM, SentimentAnalysis
+from .models import PortfolioAnalyzer, StockForecastSVM, SentimentAnalysis, IntrinsicValuation
 
 class PortfolioAnalyzerSerializer(serializers.ModelSerializer):
     """ Serialize the PA model """
@@ -24,3 +24,9 @@ class SentimentAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = SentimentAnalysis
         fields = ('ticker', 'day', 'created_at')
+
+class IntrinsicValuationSerializer(serializers.ModelSerializer):
+    """ Serialize the Intrinsic Valuation """
+    class Meta:
+        model = IntrinsicValuation
+        fields = ('ticker', 'discount_rate', 'pe', 'eps', 'growth_one_year', 'growth_five_years', 'created_at')
