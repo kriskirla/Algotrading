@@ -23,7 +23,6 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ./Algotrading
           push: true
           tags: kriskirla/algotrading:latest
       - name: Image digest
