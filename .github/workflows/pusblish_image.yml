@@ -7,25 +7,12 @@ on:
       - 'Algotrading/**'
 jobs:
   push_to_registries:
-    name: Push Docker image to multiple registries
+    name: Push Docker image to Github Package
     runs-on: ubuntu-latest
     steps:
-      working-directory: ./Algotrading
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: kriskirla/algotrading
-          tag_with_ref: true
       - name: Push to GitHub Packages
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          dockerfile: ./Algotrading/Dockerfile
-          registry: docker.pkg.github.com
-          repository: kriskirla/Algotrading
-          tag_with_ref: true
+        run: |
+          docker build  -t docker.pkg.github.com/kriskirla/Algotrading:latest ./Algotrading
+          docker push docker.pkg.github.com/kriskirla/Algotrading:latest
