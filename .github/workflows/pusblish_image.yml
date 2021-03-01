@@ -16,5 +16,5 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u "${{ github.actor }}" --password-stdin
       - name: Build container image
         run: |
-          docker build  -t docker.pkg.github.com/kriskirla/algotrading:latest ./Algotrading
-          docker push docker.pkg.github.com/kriskirla/algotrading:latest 
+          docker build  -t docker.pkg.github.com/kriskirla/algotrading/algotrading:latest ./Algotrading
+          docker push docker.pkg.github.com/kriskirla/algotrading/algotrading:latest 
