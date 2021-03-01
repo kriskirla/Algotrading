@@ -8,7 +8,8 @@ services:
     #     - POSTGRES_USER=postgres
     #     - POSTGRES_PASSWORD=postgres
     django:
-        build: ./Algotrading
+        # build: ./Algotrading
+        image: kriskirla/algotrading:latest
         volumes:
         - ./Algotrading:/app
         ports:
