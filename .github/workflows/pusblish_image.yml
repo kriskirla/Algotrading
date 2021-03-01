@@ -12,7 +12,11 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Push to GitHub Packages
-        run: |
-          docker build  -t docker.pkg.github.com/kriskirla/algotrading:latest ./Algotrading
-          docker push docker.pkg.github.com/kriskirla/algotrading:latest
+      - name: Build container image
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+          registry: docker.pkg.github.com
+          repository: kriskirla/Algotrading/tree/main/Algotrading
+          tag_with_sha: true
