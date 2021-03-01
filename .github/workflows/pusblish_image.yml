@@ -25,6 +25,7 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          dockerfile: ./Algotrading/Dockerfile
           registry: docker.pkg.github.com
           repository: kriskirla/Algotrading
           tag_with_ref: true
