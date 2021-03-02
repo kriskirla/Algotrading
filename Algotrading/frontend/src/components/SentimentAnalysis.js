@@ -13,6 +13,7 @@ const SentimentAnalysis = () => {
 
     const buttonAnalysis = (ticker, day) => {
         // Enable forecast, disable test
+        setResult(false);
         setStaticTicker(ticker);
 
         const requestOptions = {
@@ -178,7 +179,8 @@ const SentimentAnalysis = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {showGraph(result)} {showTable(result)}
+            {result && showGraph(result)}
+            {result && showTable(result)}
         </Grid>
     </Grid>
     );

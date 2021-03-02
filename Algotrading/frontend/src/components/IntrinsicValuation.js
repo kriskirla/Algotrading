@@ -17,7 +17,8 @@ const IntrinsicValuation = () => {
     const [hidden, setHidden] = useState(false);
 
     const buttonValuation = (ticker, discountRate, pe, eps, growthOneYear, growthFiveYear) => {
-        // Enable forecast, disable test
+        // Disable result to reload
+        setResult(false);
         setStaticTicker(ticker);
 
         const requestOptions = {
@@ -276,7 +277,7 @@ const IntrinsicValuation = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {showStackedBar(result)}
+            {result && showStackedBar(result)}
         </Grid>
     </Grid>
     );
