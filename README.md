@@ -10,6 +10,8 @@ Built with Django REST with React and containerized with Docker.
 
 ## Jupyter
 
+### The notebook is used for prototyping and will not be most up to date but a good reference in the logic behind each feature.
+
 Portfolio_Analyzer
 - Scrape S&P500 holdings
 - Optimize portfolio base on Efficient Frontier weights and available funds
