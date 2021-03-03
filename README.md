@@ -42,7 +42,7 @@ npm run dev
 ### The notebook is used for prototyping and will not be most up to date but a good reference in the logic behind each feature.
 
 Portfolio_Analyzer
-- Scrape S&P500 holdings
+- Scrape index holdings for processing (S&P500, Nasdaq)
 - Optimize portfolio base on Efficient Frontier weights and available funds
 
 Stock Forecast
@@ -57,4 +57,4 @@ Sentiment Analysis
 - Uses VADER to scrape headlines on finviz to determine if a stock is receiving good/bad news
 
 Stock Intrinsic Value
-- Still in progress
+- Only works for bluechip company that has P/E ratio and EPS
