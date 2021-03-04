@@ -251,12 +251,12 @@ def SentimentAnalysisService(model):
 
 def IntrinsicValuationService(model):
     ticker = model.ticker
-    discount_rate = model.discount_rate
+    discount_rate = model.discount_rate + (0.1 * ((13 - dt.today().month) / 12))
     pe = model.pe
     eps = model.eps
     growth_one_year = model.growth_one_year
     growth_five_years = model.growth_five_years
-    print(pe, eps, growth_one_year, growth_five_years)
+
     # Intrinsic value with P/E ratio, EPS, and expected Growth (Only works with Blue Chip)
     # http://theautomatic.net/yahoo_fin-documentation/#get_analysts_info
     try:

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 const IntrinsicValuation = () => {
     const [ticker, setTicker] = useState('MSFT');
-    const [discountRate, setDiscountRate] = useState(1.1);
+    const [discountRate, setDiscountRate] = useState(1);
     const [pe, setPe] = useState(0);
     const [eps, setEps] = useState(0);
     const [growthOneYear, setGrowthOneYear] = useState(0);
@@ -56,14 +56,13 @@ const IntrinsicValuation = () => {
                     fontFamily: "tahoma"
                 },
                 legend: {
-                    reversed: true,
                     verticalAlign: "center",
                     horizontalAlign: "right"
                 },
                 data: [
                     {
                         type: "column",
-                        color: "#B0D0B0",
+                        color: "#E6E6E6",
                         name: "Current Price ($" + result['PE_EPS_Model'][0] + ")",
                         showInLegend: true,
                         dataPoints: [
@@ -72,6 +71,7 @@ const IntrinsicValuation = () => {
                     },
                     {
                         type: "scatter",
+                        color: "#000000",
                         name: "Fair Price ($" + result['PE_EPS_Model'][1] + ")",
                         showInLegend: true,
                         dataPoints: [
@@ -80,6 +80,7 @@ const IntrinsicValuation = () => {
                     },
                     {
                         type: "scatter",
+                        color: "#FF0000",
                         name: "Upper Bound ($" + result['PE_EPS_Model'][2] + ")",
                         showInLegend: true,
                         dataPoints: [
@@ -88,6 +89,7 @@ const IntrinsicValuation = () => {
                     },
                     {
                         type: "scatter",
+                        color: "#00C604",
                         name: "Lower Bound ($" + result['PE_EPS_Model'][3] + ")",
                         showInLegend: true,
                         dataPoints: [
@@ -96,6 +98,7 @@ const IntrinsicValuation = () => {
                     },
                     {
                         type: "scatter",
+                        color: "#007DFF",
                         name: "Expected 5yr ($" + result['PE_EPS_Model'][4] + ")",
                         showInLegend: true,
                         dataPoints: [
