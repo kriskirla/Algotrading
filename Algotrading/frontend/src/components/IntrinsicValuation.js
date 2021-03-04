@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import CanvasJSReact from '../canvasjs.react';
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, makeStyles } from '@material-ui/core'
 
 const IntrinsicValuation = () => {
     const [ticker, setTicker] = useState('MSFT');
@@ -15,11 +14,13 @@ const IntrinsicValuation = () => {
     const [result, setResult] = useState(false);
     const [staticTicker, setStaticTicker] = useState(false);
     const [hidden, setHidden] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const buttonValuation = (ticker, discountRate, pe, eps, growthOneYear, growthFiveYear) => {
         // Disable result to reload
         setResult(false);
         setStaticTicker(ticker);
+        setLoading(true);
 
         const requestOptions = {
             method: 'POST',
@@ -39,6 +40,7 @@ const IntrinsicValuation = () => {
         ).then((data) => {
             let json = JSON.parse(data);
             console.log(json);
+            setLoading(true);
             setResult(json);
         }).catch((err) => 
             console.log(err)
@@ -281,6 +283,7 @@ const IntrinsicValuation = () => {
         </Grid>
         <Grid item xs={12} align="center">
             {result && showStackedBar(result)}
+            {loading && !result && <LinearProgress />}
         </Grid>
     </Grid>
     );

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, LinearProgress, FormControlLabel, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, makeStyles } from '@material-ui/core'
+import PaperTable from "./PaperTable";
 
 const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(10000);
@@ -12,8 +12,14 @@ const PortfolioAnalyzer = () => {
     const [startDate, setStartDate] = useState(new Date('2018-01-01T00:00:00'));
     const [endDate, setEndDate] = useState(new Date());
     const [result, setResult] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const titles = ['Ticker', 'Name', 'Allocation', 'Price', 'Total', 'Industry', 'Url'];
 
     const buttonCreatePortfolio = (fund, sp, nasdaq, startDate, endDate) => {
+        // Reset result and apply click
+        setResult(false);
+        setLoading(true);
+
         if (!(sp || nasdaq)) {
             sp = true;
         }
@@ -35,42 +41,12 @@ const PortfolioAnalyzer = () => {
         ).then((data) => {
             // Need to parse because it contains list as values
             let json = JSON.parse(data);
-            setResult(json);
             console.log(json);
+            setLoading(false);
+            setResult(json);
         }).catch((err) => 
             console.log(err)
         );
-    }
-
-    const createTable = (result) => {
-        if (result) {
-            return (
-            <TableContainer component={Paper} style={{maxHeight: 350}}>
-                <Table aria-label="simple table" stickyHeader>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="center">Ticker</TableCell>
-                            <TableCell align="center">Name</TableCell>
-                            <TableCell align="center">Allocation</TableCell>
-                            <TableCell align="center">Price</TableCell>
-                            <TableCell align="center">Total</TableCell>
-                            <TableCell align="center">Industry</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {Object.keys(result).map((key) => (
-                            <TableRow>
-                                <TableCell>{key}</TableCell>
-                                {result[key].map((row) =>
-                                    <TableCell align="center">{row}</TableCell>
-                                )}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            );
-        }
     }
 
     return (
@@ -175,7 +151,8 @@ const PortfolioAnalyzer = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {createTable(result)}
+            {result && <PaperTable result={result} titles={titles}/>}
+            {loading && !result && <LinearProgress />}
         </Grid>
     </Grid>
     );

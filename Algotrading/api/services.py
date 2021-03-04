@@ -70,25 +70,28 @@ def PortfolioAnalyzerService(model):
         ticker = yf.Ticker(symbol)
         return ticker.info
 
-    result = {}
+    table = []
 
     for symbol in allocation:
         info = get_company_information(symbol)
-        result[symbol] = [
+        table.append([
+            symbol,
             info['longName'],
             int(allocation[symbol]),
             info['regularMarketPrice'],
             "${:.2f}".format(info['regularMarketPrice'] * allocation[symbol]),
-            info['industry']
-        ]
-    
+            info['industry'],
+            f"https://ca.finance.yahoo.com/quote/{symbol}"
+        ])
+
+        result = {"Table": table}
     print(result)
 
     return result
 
 def test(model):
     time.sleep(2)
-    return {'AMD': ['Advanced Micro Devices, Inc.', 8, 89.75, '$718.00', 'Semiconductors'], 'CARR': ['Carrier Global Corporation', 113, 37, '$4181.00', 'Building Products & Equipment'], 'CLX': ['The Clorox Company', 6, 191.47, '$1148.82', 'Household & Personal Products'], 'DPZ': ["Domino's Pizza, Inc.", 2, 378.08, '$756.16', 'Restaurants'], 'DXCM': ['DexCom, Inc.', 1, 411.86, '$411.86', 'Diagnostics & Research'], 'ENPH': ['Enphase Energy, Inc.', 13, 185.02, '$2405.26', 'Solar'], 'NWL': ['Newell Brands Inc.', 1, 23.85, '$23.85', 'Household & Personal Products'], 'TGT': ['Target Corporation', 2, 191.95, '$383.90', 'Discount Stores']}
+    return {'Table': [['AMD', 'Advanced Micro Devices, Inc.', 5, 84.28, '$421.40', 'Semiconductors', 'https://ca.finance.yahoo.com/quote/AMD'], ['CTAS', 'Cintas Corporation', 3, 342.12, '$1026.36', 'Specialty Business Services', 'https://ca.finance.yahoo.com/quote/CTAS'], ['DXCM', 'DexCom, Inc.', 2, 386.79, '$773.58', 'Diagnostics & Research', 'https://ca.finance.yahoo.com/quote/DXCM'], ['MRNA', 'Moderna, Inc.', 13, 146.09, '$1899.17', 'Biotechnology', 'https://ca.finance.yahoo.com/quote/MRNA'], ['OKTA', 'Okta, Inc.', 1, 256.42, '$256.42', 'Software—Infrastructure', 'https://ca.finance.yahoo.com/quote/OKTA'], ['PDD', 'Pinduoduo Inc.', 6, 180, '$1080.00', 'Internet Retail', 'https://ca.finance.yahoo.com/quote/PDD'], ['PTON', 'Peloton Interactive, Inc.', 23, 117.905, '$2711.82', 'Leisure', 'https://ca.finance.yahoo.com/quote/PTON'], ['TSLA', 'Tesla, Inc.', 2, 687.99, '$1375.98', 'Auto Manufacturers', 'https://ca.finance.yahoo.com/quote/TSLA'], ['XEL', 'Xcel Energy Inc.', 1, 58.83, '$58.83', 'Utilities—Regulated Electric', 'https://ca.finance.yahoo.com/quote/XEL'], ['ZM', 'Zoom Video Communications, Inc.', 3, 383, '$1149.00', 'Telecom Services', 'https://ca.finance.yahoo.com/quote/ZM']]}
 
 def StockTestSVMService(model):
     """ Get the forecast for the ticker using SVM models """
