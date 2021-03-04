@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, LinearProgress, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
-import CanvasJSReact from '../canvasjs.react';
+import CanvasJSReact from "../canvasjs.react";
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core'
+import PaperTable from "./PaperTable"
 
 const showGraph = (result, staticTicker) => {
     if (result) {
@@ -45,52 +45,18 @@ const showGraph = (result, staticTicker) => {
     }
 }
 
-const showTable = (result) => {
-    if (result) {
-        return (
-        <TableContainer component={Paper} style={{maxHeight: 350}}>
-            <Table aria-label="simple table" stickyHeader>
-                <TableHead>
-                    <TableRow>
-                        <TableCell align="center">Datetime</TableCell>
-                        <TableCell align="center">Headline</TableCell>
-                        <TableCell align="center">Neg</TableCell>
-                        <TableCell align="center">Neu</TableCell>
-                        <TableCell align="center">Pos</TableCell>
-                        <TableCell align="center">Compound</TableCell>
-                        <TableCell align="center">URL</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {Object.keys(result['Table']).map((key) => (
-                        <TableRow>
-                            <TableCell>{result['Table'][key][0]}</TableCell>
-                            <TableCell>{result['Table'][key][1]}</TableCell>
-                            <TableCell>{result['Table'][key][2]}</TableCell>
-                            <TableCell>{result['Table'][key][3]}</TableCell>
-                            <TableCell>{result['Table'][key][4]}</TableCell>
-                            <TableCell>{result['Table'][key][5]}</TableCell>
-                            <TableCell>
-                                <a target="_blank" href={result['Table'][key][6]}>Link</a>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-        );
-    }
-}
-
 export default function SAFinviz() {
     const [ticker, setTicker] = useState('MSFT');
     const [day, setDay] = useState(2);
     const [result, setResult] = useState(false);
     const [staticTicker, setStaticTicker] = useState(false);
+    const [loading, setLoading] = useState(false);
+    var titles = ['Datetime', 'Headline', 'Neg', 'Neu', 'Pos', 'Compound', 'Url'];
 
     const buttonAnalysis = (ticker, day) => {
         // Enable forecast, disable test
         setResult(false);
+        setLoading(true);
         setStaticTicker(ticker);
 
         const requestOptions = {
@@ -107,6 +73,7 @@ export default function SAFinviz() {
         ).then((data) => {
             let json = JSON.parse(data);
             console.log(json);
+            setLoading(false);
             setResult(json);
         }).catch((err) => 
             console.log(err)
@@ -179,8 +146,9 @@ export default function SAFinviz() {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
+            {loading && !result && <LinearProgress />}
             {result && showGraph(result, staticTicker)}
-            {result && showTable(result, staticTicker)}
+            {result && <PaperTable result={result} titles={titles}/>}
         </Grid>
     </Grid>
     );

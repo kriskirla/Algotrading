@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, Radio, RadioGroup, FormControlLabel, FormHelperText, FormLabel } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import CanvasJSReact from '../canvasjs.react';
+import { set } from "date-fns";
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StockForecastSVM = () => {
@@ -12,11 +13,13 @@ const StockForecastSVM = () => {
     const [result, setResult] = useState(false);
     const [displaySwitch, flipSwitch] = useState(false);
     const [staticTicker, setStaticTicker] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const buttonTestSVM = (ticker, year) => {
         // Enable forecast, disable test
         flipSwitch(false);
         setResult(false);
+        setLoading(true);
         setStaticTicker(ticker);
 
         const requestOptions = {
@@ -33,6 +36,7 @@ const StockForecastSVM = () => {
         ).then((data) => {
             let json = JSON.parse(data);
             console.log(json);
+            setLoading(false);
             setResult(json);
         }).catch((err) => 
             console.log(err)
@@ -43,6 +47,7 @@ const StockForecastSVM = () => {
         // Enable forecast, disable test
         flipSwitch(true);
         setResult(false);
+        setLoading(true);
         setStaticTicker(ticker);
         
         const requestOptions = {
@@ -59,6 +64,7 @@ const StockForecastSVM = () => {
         ).then((data) => {
             let json = JSON.parse(data);
             console.log(json);
+            setLoading(false);
             setResult(json);
         }).catch((err) => 
             console.log(err)
@@ -263,6 +269,7 @@ const StockForecastSVM = () => {
         <Grid item xs={12} align="center">
             {!displaySwitch && createTestGraph(result)}
             {displaySwitch && createForecastGraph(result)}
+            {loading && !result && <LinearProgress />}
         </Grid>
     </Grid>
     );
