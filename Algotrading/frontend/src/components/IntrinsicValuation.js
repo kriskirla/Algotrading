@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 const IntrinsicValuation = () => {
     const [ticker, setTicker] = useState('MSFT');
-    const [discountRate, setDiscountRate] = useState(1.1);
+    const [discountRate, setDiscountRate] = useState(1);
     const [pe, setPe] = useState(0);
     const [eps, setEps] = useState(0);
     const [growthOneYear, setGrowthOneYear] = useState(0);
