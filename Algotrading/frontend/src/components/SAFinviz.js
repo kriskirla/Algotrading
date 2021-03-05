@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, LinearProgress, FormHelperText } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, LinearProgress, FormHelperText, Slider } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import CanvasJSReact from "../canvasjs.react";
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -109,16 +109,17 @@ export default function SAFinviz() {
         </Grid>
         <Grid item xs={12} align="center">
             <FormControl>
-                <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={day}
-                onChange={(e) => setDay(e.target.value)}
-                >
-                <MenuItem value={1}>1</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                </Select>
+                <Slider
+                    defaultValue={day}
+                    // getAriaValueText="days"
+                    aria-labelledby="discrete-slider"
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={1}
+                    max={3}
+                    onChange={(e, val) => setDay(val)}
+                />
                 <FormHelperText>
                     <div align="center">
                         Day to Analyze

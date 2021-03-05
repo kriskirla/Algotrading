@@ -3,6 +3,7 @@ import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormH
 import { Link } from "react-router-dom";
 import CanvasJSReact from '../canvasjs.react';
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import BarGraph from './BarGraph'
 
 const IntrinsicValuation = () => {
     const [ticker, setTicker] = useState('MSFT');
@@ -57,9 +58,13 @@ const IntrinsicValuation = () => {
                     // fontColor: "#008B8B",
                     fontFamily: "tahoma"
                 },
+                axisY:{
+                    gridThickness: 0,
+                },
                 legend: {
                     verticalAlign: "center",
-                    horizontalAlign: "right"
+                    horizontalAlign: "right",
+                    dockInsidePlotArea: true
                 },
                 data: [
                     {
@@ -282,6 +287,7 @@ const IntrinsicValuation = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
+            {/* {result && <BarGraph />} */}
             {result && showStackedBar(result)}
             {loading && !result && <LinearProgress />}
         </Grid>
