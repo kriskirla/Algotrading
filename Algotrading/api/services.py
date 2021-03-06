@@ -93,9 +93,10 @@ def test(model):
     time.sleep(2)
     return {'Table': [['AMD', 'Advanced Micro Devices, Inc.', 5, 84.28, '$421.40', 'Semiconductors', 'https://ca.finance.yahoo.com/quote/AMD'], ['CTAS', 'Cintas Corporation', 3, 342.12, '$1026.36', 'Specialty Business Services', 'https://ca.finance.yahoo.com/quote/CTAS'], ['DXCM', 'DexCom, Inc.', 2, 386.79, '$773.58', 'Diagnostics & Research', 'https://ca.finance.yahoo.com/quote/DXCM'], ['MRNA', 'Moderna, Inc.', 13, 146.09, '$1899.17', 'Biotechnology', 'https://ca.finance.yahoo.com/quote/MRNA'], ['OKTA', 'Okta, Inc.', 1, 256.42, '$256.42', 'Software—Infrastructure', 'https://ca.finance.yahoo.com/quote/OKTA'], ['PDD', 'Pinduoduo Inc.', 6, 180, '$1080.00', 'Internet Retail', 'https://ca.finance.yahoo.com/quote/PDD'], ['PTON', 'Peloton Interactive, Inc.', 23, 117.905, '$2711.82', 'Leisure', 'https://ca.finance.yahoo.com/quote/PTON'], ['TSLA', 'Tesla, Inc.', 2, 687.99, '$1375.98', 'Auto Manufacturers', 'https://ca.finance.yahoo.com/quote/TSLA'], ['XEL', 'Xcel Energy Inc.', 1, 58.83, '$58.83', 'Utilities—Regulated Electric', 'https://ca.finance.yahoo.com/quote/XEL'], ['ZM', 'Zoom Video Communications, Inc.', 3, 383, '$1149.00', 'Telecom Services', 'https://ca.finance.yahoo.com/quote/ZM']]}
 
-def StockTestSVMService(model):
+def StockForecastSVMService(model):
     """ Get the forecast for the ticker using SVM models """
     ticker = model.ticker
+    day = model.day
     year = model.year
 
     # Get data from yahoo finance
@@ -121,56 +122,30 @@ def StockTestSVMService(model):
     rbf_svr.fit(days, adj_close_price)
     rbf_predict = rbf_svr.predict(days)
 
-    result = {}
-
+    # Show the test prediction
+    test_graph = []
     for i in range(0, len(df.index)):
-        result[str(df.index[i])] = [
-            adj_close_price[i],
-            lin_predict[i],
-            poly_predict[i],
-            rbf_predict[i]
-        ]
-
-    return result
-
-def StockForecastSVMService(model):
-    """ Get the forecast for the ticker using SVM models """
-    ticker = model.ticker
-    year = model.year
-
-    # Get data from yahoo finance
-    df = yf.download(ticker, start=year, end=dt.today().strftime('%Y-%m-%d'))
-
-    # Create independant dataset and dependant dataset
-    df_days = df.index
-    df_adj_close = df.loc[:, 'Adj Close']
-
-    days = [[i.dayofyear] for i in df_days ]
-    adj_close_price = [float(price) for price in df_adj_close]
-
-    # Linear Model
-    lin_svr = SVR(kernel='linear', C=1000)
-    lin_svr.fit(days, adj_close_price)
-    # Polynomial Model
-    poly_svr = SVR(kernel='poly', C=1000, degree=2)
-    poly_svr.fit(days, adj_close_price)
-    # Radial Basis Function Model
-    rbf_svr = SVR(kernel='rbf', C=1000, gamma=0.85)
-    rbf_svr.fit(days, adj_close_price)
-
-    result = {}
+        test_graph.append({
+            "date": str(df.index[i]).split(" ")[0],
+            "adj": adj_close_price[i],
+            "lin": lin_predict[i],
+            "poly": poly_predict[i],
+            "rbf": rbf_predict[i]
+        })
 
     # Test the predicted price for the next n days
-    n = 3
-
-    for i in range(1, n + 1):
-        day = [[days[-1][0] + i]]
+    predict_graph = []
+    for i in range(1, day + 1):
+        predict_day = [[days[-1][0] + i]]
         date = dt.strptime('{} {}'.format(days[-1][0] + i, df_days.year[0]),'%j %Y').strftime('%Y-%m-%d %H:%M:%S')
-        result[str(date)] = [
-            float(lin_svr.predict(day)),
-            float(poly_svr.predict(day)),
-            float(rbf_svr.predict(day))
-        ]
+        predict_graph.append({
+            "date": str(date).split(" ")[0],
+            "lin": float(lin_svr.predict(predict_day)),
+            "poly": float(poly_svr.predict(predict_day)),
+            "rbf": float(rbf_svr.predict(predict_day))
+        })
+
+    result = {"TestGraph": test_graph, "PredictGraph": predict_graph}
 
     return result
 
@@ -229,7 +204,7 @@ def SentimentAnalysisService(model):
     mean_scores = mean_scores.xs('compound', axis="columns").transpose()
 
     table = []
-    mean_table = []
+    mean_graph = []
 
     for i in range(0, len(df.index)):
         table.append([
@@ -243,12 +218,12 @@ def SentimentAnalysisService(model):
         ])
     
     for i in range(0, len(mean_scores.index)):
-        mean_table.append([
-            str(mean_scores.index[i]),
-            mean_scores[ticker][i]
-        ])
+        mean_graph.append({
+            "date": str(mean_scores.index[i]),
+            "value": mean_scores[ticker][i]
+        })
     
-    result = {'Table': table, 'Mean': mean_table}
+    result = {'Table': table, 'Graph': mean_graph}
 
     return result
 
@@ -274,7 +249,7 @@ def IntrinsicValuationService(model):
         growth_one_year = (1 + float(analysis['Growth Estimates'][ticker][3][:-1])/100) if growth_one_year == 0 else growth_one_year
         growth_five_years = (1 + float(analysis['Growth Estimates'][ticker][4][:-1])/100) if growth_five_years == 0 else growth_five_years
     except:
-        return {'Bad Request': 'Missing P/E Ratio, EPS (TTM) data, or Growth analytics'}
+        return {'Failed': 'Missing P/E Ratio, EPS (TTM) data, or Growth analytics'}
     
     # Calculate fair price, upper, and lower bound
     fair = (pe * eps * growth_one_year) / discount_rate
@@ -283,12 +258,15 @@ def IntrinsicValuationService(model):
     in5years = pe * eps * growth_five_years
     
     result = {
-        'PE_EPS_Model': [
-            float("{:.2f}".format(actual)),
-            float("{:.2f}".format(fair)),
-            float("{:.2f}".format(upper)),
-            float("{:.2f}".format(lower)),
-            float("{:.2f}".format(in5years))
+        'Graph': [
+            {
+                "name": "PE_EPS_Graph",
+                "actual": float("{:.2f}".format(actual)),
+                "fair": float("{:.2f}".format(fair)),
+                "upper": float("{:.2f}".format(upper)),
+                "lower": float("{:.2f}".format(lower)),
+                "in5years": float("{:.2f}".format(in5years))
+            }
         ]
     }
 

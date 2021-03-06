@@ -16,6 +16,7 @@ class PortfolioAnalyzer(models.Model):
 class StockForecastSVM(models.Model):
     """ Create the Stock Forecast SVM object """
     ticker = models.CharField(max_length=20)
+    day = models.IntegerField(default=3, verbose_name='Days to predict')
     year = models.DateField(default=datetime.date.today, verbose_name='Analyzing Year')
     created_at = models.DateTimeField(auto_now_add=True)
 

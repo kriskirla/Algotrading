@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, LinearProgress, FormControlLabel, FormHelperText } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, Checkbox, FormGroup, FormControlLabel, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import PaperTable from "./PaperTable";
+import LinearLoading from "./LinearLoading";
 
 const PortfolioAnalyzer = () => {
-    const [fund, setFund] = useState(10000);
+    const [fund, setFund] = useState(0);
     const [sp, setSp] = useState(false);
     const [nasdaq, setNasdaq] = useState(false);
     const [startDate, setStartDate] = useState(new Date('2018-01-01T00:00:00'));
@@ -86,15 +87,17 @@ const PortfolioAnalyzer = () => {
         <Grid item xs={12} align="center">
             <FormControl>
                 <TextField 
-                require={true}
+                required
+                label="Required"
+                variant="outlined"
                 type="number"
-                defaultValue={fund}
+                placeholder="10000"
                 inputProps={{
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                defaultValue={fund}
                 onChange={(e) => setFund(e.target.value)}
+                error={fund === 0}
                 />
                 <FormHelperText>
                     <div align="center">
@@ -152,7 +155,7 @@ const PortfolioAnalyzer = () => {
         </Grid>
         <Grid item xs={12} align="center">
             {result && <PaperTable result={result} titles={titles}/>}
-            {loading && !result && <LinearProgress />}
+            {loading && !result && <LinearLoading info={"Scraping holdings from index you selected..."}/>}
         </Grid>
     </Grid>
     );
