@@ -43,6 +43,8 @@ class CreatePortfolioView(generics.ListAPIView):
             # Return the portfolio information
             service = PortfolioAnalyzerService(model)
             
+            if ("Failed" in service):
+                return Response({'Bad Request': service['Failed']}, status=status.HTTP_400_BAD_REQUEST)
             return Response(json.dumps(service), status=status.HTTP_200_OK)
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)

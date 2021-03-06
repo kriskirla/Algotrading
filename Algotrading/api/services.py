@@ -274,7 +274,7 @@ def IntrinsicValuationService(model):
         growth_one_year = (1 + float(analysis['Growth Estimates'][ticker][3][:-1])/100) if growth_one_year == 0 else growth_one_year
         growth_five_years = (1 + float(analysis['Growth Estimates'][ticker][4][:-1])/100) if growth_five_years == 0 else growth_five_years
     except:
-        return {'Bad Request': 'Missing P/E Ratio, EPS (TTM) data, or Growth analytics'}
+        return {'Failed': 'Missing P/E Ratio, EPS (TTM) data, or Growth analytics'}
     
     # Calculate fair price, upper, and lower bound
     fair = (pe * eps * growth_one_year) / discount_rate
@@ -283,12 +283,15 @@ def IntrinsicValuationService(model):
     in5years = pe * eps * growth_five_years
     
     result = {
-        'PE_EPS_Model': [
-            float("{:.2f}".format(actual)),
-            float("{:.2f}".format(fair)),
-            float("{:.2f}".format(upper)),
-            float("{:.2f}".format(lower)),
-            float("{:.2f}".format(in5years))
+        'graph': [
+            {
+                "name": "PE_EPS_Graph",
+                "actual": float("{:.2f}".format(actual)),
+                "fair": float("{:.2f}".format(fair)),
+                "upper": float("{:.2f}".format(upper)),
+                "lower": float("{:.2f}".format(lower)),
+                "in5years": float("{:.2f}".format(in5years))
+            }
         ]
     }
 

@@ -1,38 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
-import CanvasJSReact from '../canvasjs.react';
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-import BarGraph from './BarGraph'
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Scatter, ComposedChart, LabelList } from 'recharts';
 
 const IntrinsicValuation = () => {
-    const [ticker, setTicker] = useState('MSFT');
-    const [discountRate, setDiscountRate] = useState(1);
-    const [pe, setPe] = useState(0);
-    const [eps, setEps] = useState(0);
-    const [growthOneYear, setGrowthOneYear] = useState(0);
-    const [growthFiveYear, setGrowthFiveYear] = useState(0);
+    const ticker = useRef();
+    const discountRate = useRef();
+    const pe = useRef();
+    const eps = useRef();
+    const growthOneYear = useRef();
+    const growthFiveYear = useRef();
     const [result, setResult] = useState(false);
-    const [staticTicker, setStaticTicker] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const buttonValuation = (ticker, discountRate, pe, eps, growthOneYear, growthFiveYear) => {
+    const buttonValuation = () => {
         // Disable result to reload
         setResult(false);
-        setStaticTicker(ticker);
         setLoading(true);
 
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
-                ticker: ticker,
-                discount_rate: discountRate,
-                pe: pe,
-                eps: eps,
-                growth_one_year: growthOneYear,
-                growth_five_years: growthFiveYear
+                ticker: ticker.current.value,
+                discount_rate: discountRate.current.value,
+                pe: pe.current.value,
+                eps: eps.current.value,
+                growth_one_year: growthOneYear.current.value,
+                growth_five_years: growthFiveYear.current.value
             })
         };
 
@@ -48,75 +44,43 @@ const IntrinsicValuation = () => {
         );
     }
 
-    const showStackedBar = (result) => {
-        if (result) {
-            var chart = 
-            {
-                title:{
-                    text: staticTicker + " Intrinsic Value",
-                    fontWeight: "lighter",
-                    // fontColor: "#008B8B",
-                    fontFamily: "tahoma"
-                },
-                axisY:{
-                    gridThickness: 0,
-                },
-                legend: {
-                    verticalAlign: "center",
-                    horizontalAlign: "right",
-                    dockInsidePlotArea: true
-                },
-                data: [
-                    {
-                        type: "column",
-                        color: "#E6E6E6",
-                        name: "Current Price ($" + result['PE_EPS_Model'][0] + ")",
-                        showInLegend: true,
-                        dataPoints: [
-                            {x: new Date(), y: result['PE_EPS_Model'][0]}
-                        ]
-                    },
-                    {
-                        type: "scatter",
-                        color: "#000000",
-                        name: "Fair Price ($" + result['PE_EPS_Model'][1] + ")",
-                        showInLegend: true,
-                        dataPoints: [
-                            {x: new Date(), y: result['PE_EPS_Model'][1]}
-                        ]
-                    },
-                    {
-                        type: "scatter",
-                        color: "#FF0000",
-                        name: "Upper Bound ($" + result['PE_EPS_Model'][2] + ")",
-                        showInLegend: true,
-                        dataPoints: [
-                            {x: new Date(), y: result['PE_EPS_Model'][2]}
-                        ]
-                    },
-                    {
-                        type: "scatter",
-                        color: "#00C604",
-                        name: "Lower Bound ($" + result['PE_EPS_Model'][3] + ")",
-                        showInLegend: true,
-                        dataPoints: [
-                            {x: new Date(), y: result['PE_EPS_Model'][3]}
-                        ]
-                    },
-                    {
-                        type: "scatter",
-                        color: "#007DFF",
-                        name: "Expected 5yr ($" + result['PE_EPS_Model'][4] + ")",
-                        showInLegend: true,
-                        dataPoints: [
-                            {x: new Date(), y: result['PE_EPS_Model'][4]}
-                        ]
-                    }
-                ]
-            };
+    const BarGraph = (props) => {
+        if (props.result) {
+            const data = props.result['graph'];
             return (
-                <CanvasJSChart options = {chart}/>
-            )
+            <ComposedChart
+                width={325}
+                height={500}
+                data={data}
+                margin={{
+                top: 20,
+                right: 30,
+                left: 20,
+                bottom: 5,
+                }}
+            >
+                <XAxis dataKey="name" />
+                <YAxis type="number" domain={['dataMin', 'dataMax']}/>
+                <Tooltip />
+                <Legend layout="vertical" align="right" verticalAlign="middle" />
+                <ReferenceLine y={data[0]['fair']} fill="violett" stroke="#8884d8" />
+                <Scatter dataKey="actual" fill="#E7C4F3">
+                    <LabelList dataKey="actual" position="left" />
+                </Scatter>
+                <Scatter dataKey="fair" fill="black">
+                    <LabelList dataKey="fair" position="top" />
+                </Scatter>
+                <Scatter dataKey="upper" fill="red">
+                    <LabelList dataKey="upper" position="left" />
+                </Scatter>
+                <Scatter dataKey="lower" fill="#82ca9d">
+                    <LabelList dataKey="lower" position="top" />
+                </Scatter>
+                <Scatter dataKey="in5years" fill="#226DFF">
+                    <LabelList dataKey="in5years" position="left" />
+                </Scatter>
+            </ComposedChart>
+            );
         }
     }
 
@@ -134,12 +98,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={discountRate}
+                        defaultValue={1}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        defaultValue={discountRate}
-                        onChange={(e) => setDiscountRate(e.target.value)}
+                        inputRef={discountRate}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -153,12 +116,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={pe}
+                        defaultValue={0}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        defaultValue={pe}
-                        onChange={(e) => setPe(e.target.value)}
+                        inputRef={pe}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -172,12 +134,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={eps}
+                        defaultValue={0}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        defaultValue={eps}
-                        onChange={(e) => setEps(e.target.value)}
+                        inputRef={eps}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -191,12 +152,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={growthOneYear}
+                        defaultValue={0}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        defaultValue={growthOneYear}
-                        onChange={(e) => setGrowthOneYear(e.target.value)}
+                        inputRef={growthOneYear}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -210,12 +170,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={growthFiveYear}
+                        defaultValue={0}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        defaultValue={growthFiveYear}
-                        onChange={(e) => setGrowthFiveYear(e.target.value)}
+                        inputRef={growthFiveYear}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -241,13 +200,12 @@ const IntrinsicValuation = () => {
                 <TextField 
                 require={true}
                 type="text"
-                defaultValue={ticker}
+                defaultValue="MSFT"
                 inputProps={{
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                defaultValue={ticker}
-                onChange={(e) => setTicker(e.target.value)}
+                inputRef={ticker}
                 />
                 <FormHelperText>
                     <div align="center">
@@ -271,7 +229,7 @@ const IntrinsicValuation = () => {
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonValuation(ticker, discountRate, pe, eps, growthOneYear, growthFiveYear)}
+            onClick={buttonValuation}
             >
                 Show Intrinsic Valuation
             </Button>
@@ -287,8 +245,8 @@ const IntrinsicValuation = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {/* {result && <BarGraph />} */}
-            {result && showStackedBar(result)}
+            {result && <BarGraph result={result}/>}
+            {/* {result && showStackedBar(result)} */}
             {loading && !result && <LinearProgress />}
         </Grid>
     </Grid>
