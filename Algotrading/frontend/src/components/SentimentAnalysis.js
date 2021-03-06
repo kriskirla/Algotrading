@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { AppBar, Tabs, Tab, TabPanel, Paper, Toolbar, IconButton, Typography, Button } from '@material-ui/core';
 import { Link } from "react-router-dom";
-import CanvasJSReact from '../canvasjs.react';
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 import SAFinviz from './SAFinviz'
 
 export default function SentimentAnalysis () {

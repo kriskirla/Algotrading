@@ -1,15 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Scatter, ComposedChart, LabelList } from 'recharts';
+import LinearLoading from "./LinearLoading";
 
 const IntrinsicValuation = () => {
-    const ticker = useRef();
-    const discountRate = useRef();
-    const pe = useRef();
-    const eps = useRef();
-    const growthOneYear = useRef();
-    const growthFiveYear = useRef();
+    const [ticker, setTicker] = useState("");
+    const [discountRate, setDiscountRate] = useState(1);
+    const [pe, setPe] = useState(0);
+    const [eps, setEps] = useState(0);
+    const [growthOneYear, setGrowthOneYear] = useState(0);
+    const [growthFiveYear, setGrowthFiveYear] = useState(0);
     const [result, setResult] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -23,12 +24,12 @@ const IntrinsicValuation = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
-                ticker: ticker.current.value,
-                discount_rate: discountRate.current.value,
-                pe: pe.current.value,
-                eps: eps.current.value,
-                growth_one_year: growthOneYear.current.value,
-                growth_five_years: growthFiveYear.current.value
+                ticker: ticker,
+                discount_rate: discountRate,
+                pe: pe,
+                eps: eps,
+                growth_one_year: growthOneYear,
+                growth_five_years: growthFiveYear
             })
         };
 
@@ -44,9 +45,9 @@ const IntrinsicValuation = () => {
         );
     }
 
-    const BarGraph = (props) => {
-        if (props.result) {
-            const data = props.result['graph'];
+    const BarGraph = (result) => {
+        if (result) {
+            const data = result['Graph'];
             return (
             <ComposedChart
                 width={325}
@@ -98,11 +99,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={1}
+                        defaultValue={discountRate}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        inputRef={discountRate}
+                        onChange={(e) => setDiscountRate(e.target.value)}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -116,11 +117,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={0}
+                        defaultValue={pe}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        inputRef={pe}
+                        onChange={(e) => setPe(e.target.value)}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -134,11 +135,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={0}
+                        defaultValue={eps}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        inputRef={eps}
+                        onChange={(e) => setEps(e.target.value)}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -152,11 +153,11 @@ const IntrinsicValuation = () => {
                         <TextField 
                         require={true}
                         type="text"
-                        defaultValue={0}
+                        defaultValue={growthOneYear}
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        inputRef={growthOneYear}
+                        onChange={(e) => setGrowthOneYear(e.target.value)}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -174,7 +175,7 @@ const IntrinsicValuation = () => {
                         inputProps={{
                             style: {textAlign: "center"}
                         }}
-                        inputRef={growthFiveYear}
+                        onChange={(e) => setGrowthFiveYear(e.target.value)}
                         />
                         <FormHelperText>
                             <div align="center">
@@ -198,14 +199,19 @@ const IntrinsicValuation = () => {
         <Grid item xs={12} align="center">
             <FormControl>
                 <TextField 
+                required
+                label="Required"
+                variant="outlined"
                 require={true}
                 type="text"
-                defaultValue="MSFT"
+                placeholder="MSFT"
+                // defaultValue="MSFT"
                 inputProps={{
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                inputRef={ticker}
+                onChange={(e) => setTicker(e.target.value)}
+                error={ticker === ""}
                 />
                 <FormHelperText>
                     <div align="center">
@@ -245,9 +251,8 @@ const IntrinsicValuation = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {result && <BarGraph result={result}/>}
-            {/* {result && showStackedBar(result)} */}
-            {loading && !result && <LinearProgress />}
+            {loading && !result && <LinearLoading info={"Fetching Data and Calculating"}/>}
+            {result && BarGraph(result)}
         </Grid>
     </Grid>
     );

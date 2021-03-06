@@ -17,7 +17,7 @@ class StockForecastSVMSerializer(serializers.ModelSerializer):
     """ Serialize the Stock Forecast SVM model """
     class Meta:
         model = StockForecastSVM
-        fields = ('ticker', 'year', 'created_at')
+        fields = ('ticker', 'day', 'year', 'created_at')
 
 class SentimentAnalysisSerializer(serializers.ModelSerializer):
     """ Serialize the Stock Sentiment """

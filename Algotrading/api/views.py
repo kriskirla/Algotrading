@@ -5,7 +5,7 @@ from rest_framework.response import Response
 import json
 from .models import PortfolioAnalyzer, StockForecastSVM, SentimentAnalysis, IntrinsicValuation
 from .serializer import PortfolioAnalyzerSerializer, CreatePortfolioSerializer, StockForecastSVMSerializer, SentimentAnalysisSerializer, IntrinsicValuationSerializer
-from .services import PortfolioAnalyzerService, test, StockTestSVMService, StockForecastSVMService, SentimentAnalysisService, IntrinsicValuationService
+from .services import PortfolioAnalyzerService, test, StockForecastSVMService, SentimentAnalysisService, IntrinsicValuationService
 
 # Create your views here.
 class PortfolioAnalyzerView(generics.ListAPIView):
@@ -49,37 +49,6 @@ class CreatePortfolioView(generics.ListAPIView):
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
-class StockTestSVMView(generics.ListAPIView):
-    """ Create the forecast view """
-    queryset = StockForecastSVM.objects.all()
-    serializer_class = StockForecastSVMSerializer
-
-    def post(self, request, format=None):
-        """ POST request 
-        
-        This will save the payload and return the data required to generate the
-        forecast in the frontend.
-        
-        """
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid():
-            if serializer.data.get('ticker') is not None:
-                ticker = serializer.data.get('ticker')
-            else:
-                return Response({'Bad Request': 'Please enter a ticker symbol'}, status=status.HTTP_400_BAD_REQUEST)
-            # Save the information to database
-            year = serializer.data.get('year')
-            model = StockForecastSVM(ticker=ticker, year=year)
-            model.save()
-
-            # Return the portfolio information
-            service = StockTestSVMService(model)
-            
-            return Response(json.dumps(service), status=status.HTTP_200_OK)
-
-        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
-
 class StockForecastSVMView(generics.ListAPIView):
     """ Create the forecast view """
     queryset = StockForecastSVM.objects.all()
@@ -101,7 +70,8 @@ class StockForecastSVMView(generics.ListAPIView):
                 return Response({'Bad Request': 'Please enter a ticker symbol'}, status=status.HTTP_400_BAD_REQUEST)
             # Save the information to database
             year = serializer.data.get('year')
-            model = StockForecastSVM(ticker=ticker, year=year)
+            day = serializer.data.get('day')
+            model = StockForecastSVM(ticker=ticker, day=day, year=year)
             model.save()
 
             # Return the portfolio information

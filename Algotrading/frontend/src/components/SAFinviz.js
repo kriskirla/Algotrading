@@ -1,55 +1,14 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, LinearProgress, FormHelperText, Slider } from '@material-ui/core';
 import { Link } from "react-router-dom";
-import CanvasJSReact from "../canvasjs.react";
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import { Button, Grid, Typography, TextField, FormControl, MenuItem, Select, LinearProgress, FormHelperText, Slider, capitalize } from '@material-ui/core';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Scatter, ComposedChart, LabelList } from 'recharts';
 import PaperTable from "./PaperTable"
+import LinearLoading from "./LinearLoading";
 
-const showGraph = (result, staticTicker) => {
-    if (result) {
-        var mean_table = []
-
-        Object.keys(result['Mean']).map((key) => {
-            mean_table.push({x: new Date(result['Mean'][key][0] + 'T00:00:00'), y: result['Mean'][key][1]});
-        });
-        
-        var chart = 
-        {
-            title:{
-                text: staticTicker + " Sentiment",
-                fontWeight: "lighter",
-                // fontColor: "#008B8B",
-                fontFamily: "tahoma"
-            },
-            height: 200,
-            axisX:{
-                intervalType: "day",
-                interval: 1,
-                valueFormatString: "YYYY-MM-DD",
-            },
-            axisY: {
-                title: "Sentimental Value",
-            },
-            data: [
-            {
-                type: "bar",
-                name: "Score",
-                showInLegend: true,
-                dataPoints: mean_table
-            }
-            ]
-        };
-        return (
-            <CanvasJSChart options = {chart}/>
-        )
-    }
-}
-
-export default function SAFinviz() {
-    const [ticker, setTicker] = useState('MSFT');
+const SAFinviz = () => {
+    const [ticker, setTicker] = useState("");
     const [day, setDay] = useState(2);
     const [result, setResult] = useState(false);
-    const [staticTicker, setStaticTicker] = useState(false);
     const [loading, setLoading] = useState(false);
     var titles = ['Datetime', 'Headline', 'Neg', 'Neu', 'Pos', 'Compound', 'Url'];
 
@@ -57,7 +16,6 @@ export default function SAFinviz() {
         // Enable forecast, disable test
         setResult(false);
         setLoading(true);
-        setStaticTicker(ticker);
 
         const requestOptions = {
             method: 'POST',
@@ -90,15 +48,18 @@ export default function SAFinviz() {
         <Grid item xs={12} align="center">
             <FormControl>
                 <TextField 
-                require={true}
+                required
+                label="Required"
+                variant="outlined"
                 type="text"
-                defaultValue={ticker}
+                placeholder="MSFT"
+                // defaultValue="MSFT"
                 inputProps={{
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                defaultValue={ticker}
                 onChange={(e) => setTicker(e.target.value)}
+                error={ticker === ""}
                 />
                 <FormHelperText>
                     <div align="center">
@@ -125,7 +86,7 @@ export default function SAFinviz() {
                         Day to Analyze
                     </div>
                 </FormHelperText>
-        </FormControl>
+            </FormControl>
         </Grid>
         <Grid item xs={12} align="center">
             <Button
@@ -147,10 +108,39 @@ export default function SAFinviz() {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {loading && !result && <LinearProgress />}
-            {result && showGraph(result, staticTicker)}
+            {loading && !result && <LinearLoading info={"Scraping Finviz"}/>}
+            {result && HorizontalBarGraph(result)}
             {result && <PaperTable result={result} titles={titles}/>}
         </Grid>
     </Grid>
     );
 }
+
+const HorizontalBarGraph = (result) => {
+    if (result) {
+        const data = result['Graph'];
+        return (
+        <BarChart
+            width={900}
+            height={150}
+            data={data}
+            layout="vertical"
+            margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5
+            }}
+        >
+            <XAxis dayakey="value" type="number" />
+            <YAxis dataKey="date" type="category" reversed />
+            <Tooltip />
+            <Legend />
+            <ReferenceLine x={0} stroke="#000" />
+            <Bar dataKey="value" fill="#8884d8" />
+        </BarChart>
+        );
+    }
+}
+
+export default SAFinviz;

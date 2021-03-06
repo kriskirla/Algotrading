@@ -1,60 +1,31 @@
 import React, { useState } from "react";
-import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText } from '@material-ui/core';
+import { Button, Grid, Typography, TextField, FormControl, LinearProgress, FormHelperText, Slider } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import DateFnsUtils from '@date-io/date-fns'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import CanvasJSReact from '../canvasjs.react';
-import { set } from "date-fns";
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import { ComposedChart, Line, Area, Bar, XAxis, YAxis, Brush, Tooltip, Legend, Scatter, ResponsiveContainer } from 'recharts';
+import LinearLoading from "./LinearLoading";
 
 const StockForecastSVM = () => {
-    const [ticker, setTicker] = useState('MSFT');
+    const [ticker, setTicker] = useState("");
+    const [day, setDay] = useState(2);
     const [year, setYear] = useState(new Date('2021-01-01T00:00:00'));
     const [result, setResult] = useState(false);
     const [displaySwitch, flipSwitch] = useState(false);
-    const [staticTicker, setStaticTicker] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const buttonTestSVM = (ticker, year) => {
+    const buttonTestSVM = () => {
         // Enable forecast, disable test
         flipSwitch(false);
         setResult(false);
         setLoading(true);
-        setStaticTicker(ticker);
 
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
                 ticker: ticker,
-                year: year.toISOString().substring(0, 10)
-            })
-        };
-
-        fetch("/api/svmtest", requestOptions).then((response) => 
-            response.json()
-        ).then((data) => {
-            let json = JSON.parse(data);
-            console.log(json);
-            setLoading(false);
-            setResult(json);
-        }).catch((err) => 
-            console.log(err)
-        );
-    }
-
-    const buttonForecastSVM = (ticker, year) => {
-        // Enable forecast, disable test
-        flipSwitch(true);
-        setResult(false);
-        setLoading(true);
-        setStaticTicker(ticker);
-        
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                ticker: ticker,
+                day: day,
                 year: year.toISOString().substring(0, 10)
             })
         };
@@ -65,136 +36,38 @@ const StockForecastSVM = () => {
             let json = JSON.parse(data);
             console.log(json);
             setLoading(false);
-            setResult(json);
+            setResult(json["TestGraph"]);
         }).catch((err) => 
             console.log(err)
         );
     }
 
-    const createTestGraph = (result) => {
-        if (result) {
-            var close = [];
-            var linear = [];
-            var poly = [];
-            var rbf = [];
+    const buttonForecastSVM = () => {
+        // Enable forecast, disable test
+        flipSwitch(true);
+        setResult(false);
+        setLoading(true);
+        
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                ticker: ticker,
+                day: day,
+                year: year.toISOString().substring(0, 10)
+            })
+        };
 
-            Object.keys(result).map((key) => {
-                close.push({x: new Date(key), y: result[key][0]});
-                linear.push({x: new Date(key), y: result[key][1]});
-                poly.push({x: new Date(key), y: result[key][2]});
-                rbf.push({x: new Date(key), y: result[key][3]});
-            });
-            
-            var chart = 
-            {
-                title:{
-                    text: staticTicker + " SVM Trained Model",
-                    fontWeight: "lighter",
-                    // fontColor: "#008B8B",
-                    fontFamily: "tahoma"
-                },
-                axisX:{
-                    intervalType: "hour",        
-                    valueFormatString: "YYYY-MM-DD"
-                },
-                axisY: {
-                    title: "Price(USD)"
-                },
-                legend: {
-                    cursor: "pointer",
-                    verticalAlign: "top",
-                    horizontalAlign: "center",
-                    dockInsidePlotArea: true
-                },
-                data: [
-                {
-                    type: "splineArea",
-                    name: "Closing Price",
-                    showInLegend: true,
-                    dataPoints: close
-                },
-                {
-                    type: "line",
-                    name: "RBF",
-		            showInLegend: true,
-                    dataPoints: rbf
-                },
-                {
-                    type: "line",
-                    name: "Poly",
-		            showInLegend: true,
-                    dataPoints: poly
-                },
-                {
-                    type: "line",
-                    name: "Linear",
-		            showInLegend: true,
-                    dataPoints: linear
-                }]
-            };
-            return (
-                <CanvasJSChart options = {chart}/>
-            )
-        }
-    }
-
-    const createForecastGraph = (result) => {
-        if (result) {
-            var linear = [];
-            var poly = [];
-            var rbf = [];
-
-            Object.keys(result).map((key) => {
-                linear.push({x: new Date(key), y: result[key][0]});
-                poly.push({x: new Date(key), y: result[key][1]});
-                rbf.push({x: new Date(key), y: result[key][2]});
-            });
-            
-            var chart = 
-            {
-                title:{
-                    text: staticTicker + " Forecast",
-                    fontWeight: "lighter",
-                    // fontColor: "#008B8B",
-                    fontFamily: "tahoma"
-                },
-                axisX:{
-                    intervalType: "hour",
-                    valueFormatString: "YYYY-MM-DD"
-                },
-                axisY: {
-                    title: "Price(USD)"
-                },
-                legend: {
-                    cursor: "pointer",
-                    verticalAlign: "top",
-                    horizontalAlign: "center",
-                    dockInsidePlotArea: true
-                },
-                data: [
-                {
-                    type: "line",
-                    name: "RBF",
-		            showInLegend: true,
-                    dataPoints: rbf
-                },
-                {
-                    type: "line",
-                    name: "Poly",
-		            showInLegend: true,
-                    dataPoints: poly
-                },
-                {
-                    type: "line",
-                    name: "Linear",
-		            showInLegend: true,
-                    dataPoints: linear
-                }]
-            };
-            return (
-                <CanvasJSChart options = {chart}/>
-            )
-        }
+        fetch("/api/svmforecast", requestOptions).then((response) => 
+            response.json()
+        ).then((data) => {
+            let json = JSON.parse(data);
+            console.log(json);
+            setLoading(false);
+            setResult(json["PredictGraph"]);
+        }).catch((err) => 
+            console.log(err)
+        );
     }
 
     return (
@@ -207,19 +80,41 @@ const StockForecastSVM = () => {
         <Grid item xs={12} align="center">
             <FormControl>
                 <TextField 
-                require={true}
+                required
+                label="Required"
+                variant="outlined"
+                placeholder="MSFT"
                 type="text"
-                defaultValue={ticker}
                 inputProps={{
                     min: 0,
                     style: {textAlign: "center"}
                 }}
-                defaultValue={ticker}
                 onChange={(e) => setTicker(e.target.value)}
+                error={ticker === ""}
                 />
                 <FormHelperText>
                     <div align="center">
                         Input the ticker to forecast
+                    </div>
+                </FormHelperText>
+            </FormControl>
+        </Grid>
+        <Grid item xs={12} align="center">
+            <FormControl>
+                <Slider
+                    defaultValue={day}
+                    // getAriaValueText="days"
+                    aria-labelledby="discrete-slider"
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={1}
+                    max={3}
+                    onChange={(e, val) => setDay(val)}
+                />
+                <FormHelperText>
+                    <div align="center">
+                        Day to Analyze
                     </div>
                 </FormHelperText>
             </FormControl>
@@ -231,7 +126,7 @@ const StockForecastSVM = () => {
                     format="yyyy-MM-dd"
                     margin="normal"
                     id="date-picker-inline"
-                    label="Select the date to analyze"
+                    label="Select the start date to analyze"
                     value={year}
                     onChange={(date) => {setYear(date)}}
                     KeyboardButtonProps={{
@@ -244,14 +139,14 @@ const StockForecastSVM = () => {
             <Button
             color="secondary"
             variant="contained"
-            onClick={() => buttonTestSVM(ticker, year)}
+            onClick={buttonTestSVM}
             >
                 Test Trained Model
             </Button>
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonForecastSVM(ticker, year)}
+            onClick={buttonForecastSVM}
             >
                 Show Forecast
             </Button>
@@ -267,12 +162,40 @@ const StockForecastSVM = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {!displaySwitch && createTestGraph(result)}
-            {displaySwitch && createForecastGraph(result)}
-            {loading && !result && <LinearProgress />}
+            {loading && !result && <LinearLoading info={"Trainning Model"}/>}
+            {!displaySwitch && createGraph(result)}
+            {displaySwitch && createGraph(result)}
         </Grid>
     </Grid>
     );
+}
+
+const createGraph = (result) => {
+    if (result) {
+        return (
+        <ComposedChart
+            width={900}
+            height={500}
+            data={result}
+            margin={{
+                top: 20,
+                right: 20,
+                bottom: 20,
+                left: 20,
+            }}
+        >
+            <XAxis dayakey="date" type="category" />
+            <YAxis type="number" domain={['auto', 'auto']} />
+            <Tooltip />
+            <Legend />
+            <Area type="monotone" dataKey="adj" fill="#F4DDFC" stroke="#8884d8" />
+            <Line type="monotone" dataKey="lin" stroke="#FFA300" />
+            <Line type="monotone" dataKey="poly" stroke="#017100" />
+            <Line type="monotone" dataKey="rbf" stroke="#0020FF" />
+            <Brush />
+        </ComposedChart>
+        );
+    }
 }
 
 export default StockForecastSVM;
