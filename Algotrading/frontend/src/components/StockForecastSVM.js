@@ -162,7 +162,7 @@ const StockForecastSVM = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {loading && !result && <LinearLoading info={"Trainning Model"}/>}
+            {loading && !result && <LinearLoading info={"Fetching data and Trainning Model..."}/>}
             {!displaySwitch && createGraph(result)}
             {displaySwitch && createGraph(result)}
         </Grid>

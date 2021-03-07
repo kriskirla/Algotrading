@@ -108,7 +108,7 @@ const SAFinviz = () => {
             </Button>
         </Grid>
         <Grid item xs={12} align="center">
-            {loading && !result && <LinearLoading info={"Scraping Finviz"}/>}
+            {loading && !result && <LinearLoading info={"Scraping Finviz for data..."}/>}
             {result && HorizontalBarGraph(result)}
             {result && <PaperTable result={result} titles={titles}/>}
         </Grid>
