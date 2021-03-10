@@ -5,13 +5,13 @@ class PortfolioAnalyzerSerializer(serializers.ModelSerializer):
     """ Serialize the PA model """
     class Meta:
         model = PortfolioAnalyzer
-        fields = ('fund', 'sp', 'nasdaq', 'start_date', 'end_date', 'created_at')
+        fields = ('fund', 'tickers', 'sp', 'nasdaq', 'start_date', 'end_date', 'created_at')
 
 class CreatePortfolioSerializer(serializers.ModelSerializer):
     """ Serialize the Create PA model """
     class Meta:
         model = PortfolioAnalyzer
-        fields = ('fund', 'sp', 'nasdaq', 'start_date', 'end_date')
+        fields = ('fund', 'tickers', 'sp', 'nasdaq', 'start_date', 'end_date')
 
 class StockForecastSVMSerializer(serializers.ModelSerializer):
     """ Serialize the Stock Forecast SVM model """

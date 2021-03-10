@@ -8,6 +8,7 @@ import LinearLoading from "./LinearLoading";
 
 const PortfolioAnalyzer = () => {
     const [fund, setFund] = useState(0);
+    const [tickers, setTickers] = useState("");
     const [sp, setSp] = useState(false);
     const [nasdaq, setNasdaq] = useState(false);
     const [startDate, setStartDate] = useState(new Date('2018-01-01T00:00:00'));
@@ -16,20 +17,17 @@ const PortfolioAnalyzer = () => {
     const [loading, setLoading] = useState(false);
     const titles = ['Ticker', 'Name', 'Allocation', 'Price', 'Total', 'Industry', 'Url'];
 
-    const buttonCreatePortfolio = (fund, sp, nasdaq, startDate, endDate) => {
+    const buttonCreatePortfolio = (fund, tickers, sp, nasdaq, startDate, endDate) => {
         // Reset result and apply click
         setResult(false);
         setLoading(true);
-
-        if (!(sp || nasdaq)) {
-            sp = true;
-        }
     
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
                 fund: fund,
+                tickers: tickers,
                 sp: sp,
                 nasdaq: nasdaq,
                 start_date: startDate.toISOString().substring(0, 10),
@@ -58,33 +56,22 @@ const PortfolioAnalyzer = () => {
             </Typography>
         </Grid>
         <Grid item xs={12} align="center">
-            <FormHelperText>
-                <div align="center">
-                    Select the indexes you want to include.
-                </div>
-                <div align="center">
-                    If nothing is selected, it will default to using only S&P500
-                </div>
-            </FormHelperText>
-        </Grid>
-        <Grid item xs={12} align="center">
-            <FormControl component="fieldset" >
-                <FormGroup row defaultValue="true" >
-                    <FormControlLabel 
-                    control={<Checkbox color="primary"/>} 
-                    label="S&P500" labelPlacement="start" 
-                    onChange={() => setSp(!sp)} 
-                    />
-                    <FormControlLabel 
-                    control={<Checkbox color="primary"/>} 
-                    label="Nasdaq-100" 
-                    labelPlacement="start" 
-                    onChange={() => setNasdaq(!nasdaq)} 
-                    />
-                </FormGroup>
+            <FormControl>
+                <TextField
+                id="outlined-multiline-static"
+                label="Tickers"
+                multiline
+                rows={4}
+                placeholder="AAPL,MSFT,AMZN,..."
+                variant="outlined"
+                onChange={(e) => setTickers(e.target.value)}
+                />
+                <FormHelperText>
+                    <div align="center">
+                        Enter your own tickers
+                    </div>
+                </FormHelperText>
             </FormControl>
-        </Grid>
-        <Grid item xs={12} align="center">
             <FormControl>
                 <TextField 
                 required
@@ -104,6 +91,33 @@ const PortfolioAnalyzer = () => {
                         Available fund
                     </div>
                 </FormHelperText>
+            </FormControl>
+        </Grid>
+        <Grid item xs={12} align="center">
+            <FormHelperText>
+                <div align="center">
+                    You can also select the indexes you want to include.
+                </div>
+                <div align="center">
+                    If no tickers are inputted and no indecies selected, it will default to using only S&P500
+                </div>
+            </FormHelperText>
+        </Grid>
+        <Grid item xs={12} align="center">
+            <FormControl component="fieldset" >
+                <FormGroup row defaultValue="true" >
+                    <FormControlLabel 
+                    control={<Checkbox color="primary"/>} 
+                    label="S&P500" labelPlacement="start" 
+                    onChange={() => setSp(!sp)} 
+                    />
+                    <FormControlLabel 
+                    control={<Checkbox color="primary"/>} 
+                    label="Nasdaq-100" 
+                    labelPlacement="start" 
+                    onChange={() => setNasdaq(!nasdaq)} 
+                    />
+                </FormGroup>
             </FormControl>
         </Grid>
         <Grid item xs={12} align="center">
@@ -138,7 +152,7 @@ const PortfolioAnalyzer = () => {
             <Button
             color="primary"
             variant="contained"
-            onClick={() => buttonCreatePortfolio(fund, sp, nasdaq, startDate, endDate)}
+            onClick={() => buttonCreatePortfolio(fund, tickers, sp, nasdaq, startDate, endDate)}
             >
                 Create Portfolio
             </Button>
