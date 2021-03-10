@@ -33,11 +33,13 @@ class CreatePortfolioView(generics.ListAPIView):
             else:
                 fund = 0
             # Save the information to database
+            print(serializer)
+            tickers = serializer.data.get('tickers')
             sp = serializer.data.get('sp')
             nasdaq = serializer.data.get('nasdaq')
             start_date = serializer.data.get('start_date')
             end_date = serializer.data.get('end_date')
-            model = PortfolioAnalyzer(fund=fund, sp=sp, nasdaq=nasdaq, start_date=start_date, end_date=end_date)
+            model = PortfolioAnalyzer(fund=fund, tickers=tickers, sp=sp, nasdaq=nasdaq, start_date=start_date, end_date=end_date)
             model.save()
 
             # Return the portfolio information

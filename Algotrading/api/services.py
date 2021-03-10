@@ -23,12 +23,13 @@ def PortfolioAnalyzerService(model):
     start_date = model.start_date
     end_date = model.end_date
     fund = model.fund
+    tickers = model.tickers.split(',')
 
     # Getting all tickers
-    ticker = set()
+    ticker = set(tickers)
 
     # Tickers to track S&P500
-    if (model.sp):
+    if (model.sp or (len(tickers) == 0 and not model.nasdaq)):
         payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
         first_table = payload[0]
         second_table = payload[1]

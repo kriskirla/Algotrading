@@ -7,6 +7,7 @@ import datetime
 class PortfolioAnalyzer(models.Model):
     """ Creates the PA object to trigger backend """
     fund = models.FloatField(help_text="i.e. 10000")
+    tickers = models.CharField(max_length=200, null=True)
     sp = models.BooleanField(default=False, verbose_name='S&P500')
     nasdaq = models.BooleanField(default=False, verbose_name='NASDAQ-100')
     start_date = models.DateField(default=datetime.date.today, verbose_name='Start Period')
