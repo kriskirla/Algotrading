@@ -17,8 +17,9 @@ docker-compose up
 ```
 After build is completed, navigate to http://0.0.0.0:8000
 
-If you are having authentication issue, issue this command before docker-compose.
-Replace `$GITHUB_USERNAME`, `$GITHUB_TOKEN` with your own
+If you are having authentication issue, run this command before docker-compose (replacing `$GITHUB_USERNAME`, `$GITHUB_TOKEN` with your own).
+
+Note: Make sure your Github token has `read:packages` scope.
 ```
 docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN docker.pkg.github.com
 ```
