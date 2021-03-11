@@ -14,5 +14,13 @@ services:
         - ./Algotrading:/app
         ports:
         - "8000:8000"
+        depends_on:
+        - migration
+        # - db
+    migration:
+        image: docker.pkg.github.com/kriskirla/algotrading/algotrading:latest
+        command: python manage.py migrate --noinput
+        volumes:
+        - ./Algotrading:/app
         # depends_on:
         # - db
