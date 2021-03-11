@@ -17,6 +17,12 @@ docker-compose up
 ```
 After build is completed, navigate to http://0.0.0.0:8000
 
+If you are having authentication issue, issue this command before docker-compose.
+Replace `$GITHUB_USERNAME`, `$GITHUB_TOKEN` with your own
+```
+docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN docker.pkg.github.com
+```
+
 ### Locally Testing
 ```
 cd Algotrading
