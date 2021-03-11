@@ -15,13 +15,14 @@ Built with Django REST with React.
 # This will automatically pull image from Github Package
 docker-compose up
 ```
-After build is completed, navigate to http://0.0.0.0:8000
+After build is completed, navigate to http://127.0.0.1:8000/
 
 If you are having authentication issue, run this command before docker-compose (replacing `$GITHUB_USERNAME`, `$GITHUB_TOKEN` with your own).
 
 Note: Make sure your Github token has `read:packages` scope.
 ```
 docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN docker.pkg.github.com
+docker-compose up
 ```
 
 ### Locally Testing
