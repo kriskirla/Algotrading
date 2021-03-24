@@ -3,9 +3,9 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import json
-from .models import PortfolioAnalyzer, StockForecastSVM, SentimentAnalysis, IntrinsicValuation
-from .serializer import PortfolioAnalyzerSerializer, CreatePortfolioSerializer, StockForecastSVMSerializer, SentimentAnalysisSerializer, IntrinsicValuationSerializer
-from .services import PortfolioAnalyzerService, test, StockForecastSVMService, SentimentAnalysisService, IntrinsicValuationService
+from .models import PortfolioAnalyzer, StockForecastSVM, SentimentAnalysisFinviz, SentimentAnalysisReddit, IntrinsicValuation
+from .serializer import PortfolioAnalyzerSerializer, CreatePortfolioSerializer, StockForecastSVMSerializer, SentimentAnalysisFinvizSerializer, SentimentAnalysisRedditSerializer, IntrinsicValuationSerializer
+from .services import PortfolioAnalyzerService, test, StockForecastSVMService, SentimentAnalysisFinvizService, SentimentAnalysisRedditService, IntrinsicValuationService
 
 # Create your views here.
 class PortfolioAnalyzerView(generics.ListAPIView):
@@ -83,10 +83,10 @@ class StockForecastSVMView(generics.ListAPIView):
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
-class SentimentAnalysisView(generics.ListAPIView):
+class SentimentAnalysisFinvizView(generics.ListAPIView):
     """ Create the sentiment analysis view """
-    queryset = SentimentAnalysis.objects.all()
-    serializer_class = SentimentAnalysisSerializer
+    queryset = SentimentAnalysisFinviz.objects.all()
+    serializer_class = SentimentAnalysisFinvizSerializer
 
     def post(self, request, format=None):
         """ POST request 
@@ -104,11 +104,47 @@ class SentimentAnalysisView(generics.ListAPIView):
                 return Response({'Bad Request': 'Please enter a ticker symbol'}, status=status.HTTP_400_BAD_REQUEST)
             # Save the information to database
             day = serializer.data.get('day')
-            model = SentimentAnalysis(ticker=ticker, day=day)
+            model = SentimentAnalysisFinvizSerializer(ticker=ticker, day=day)
             model.save()
 
             # Return the portfolio information
-            service = SentimentAnalysisService(model)
+            service = SentimentAnalysisFinvizService(model)
+            
+            return Response(json.dumps(service), status=status.HTTP_200_OK)
+
+        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
+
+class SentimentAnalysisRedditView(generics.ListAPIView):
+    """ Create the sentiment analysis view """
+    queryset = SentimentAnalysisReddit.objects.all()
+    serializer_class = SentimentAnalysisRedditSerializer
+
+    def post(self, request, format=None):
+        """ POST request 
+        
+        This will save the payload and return the data required to generate the
+        the sentiment chart and news.
+        
+        """
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            if serializer.data.get('subreddit') is not None:
+                subreddit = serializer.data.get('subreddit')
+            else:
+                return Response({'Bad Request': 'Please enter a ticker symbol'}, status=status.HTTP_400_BAD_REQUEST)
+            # Save the information to database
+            client_id = serializer.data.get('client_id')
+            client_secret = serializer.data.get('client_secret')
+            user_agent = serializer.data.get('user_agent')
+            subreddits = serializer.data.get('subreddits')
+            filter_selfpost = serializer.data.get('filter_selfpost')
+            model = SentimentAnalysisReddit(client_id=client_id, client_secret=client_secret, user_agent=user_agent, 
+                subreddits=subreddits, subreddit=subreddit, filter_selfpost=filter_selfpost)
+            model.save()
+
+            # Return the portfolio information
+            service = SentimentAnalysisRedditService(model)
             
             return Response(json.dumps(service), status=status.HTTP_200_OK)
 

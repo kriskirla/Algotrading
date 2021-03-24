@@ -42,7 +42,7 @@ const SAFinviz = () => {
     <Grid container spacing={1} cellHeight={180}>
         <Grid item xs={12} align="center">
             <Typography component="h4" variant="h4">
-                Stock Sentiment Analysis
+                Finviz Sentiment Analysis
             </Typography>
         </Grid>
         <Grid item xs={12} align="center">

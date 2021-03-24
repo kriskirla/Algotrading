@@ -21,10 +21,19 @@ class StockForecastSVM(models.Model):
     year = models.DateField(default=datetime.date.today, verbose_name='Analyzing Year')
     created_at = models.DateTimeField(auto_now_add=True)
 
-class SentimentAnalysis(models.Model):
+class SentimentAnalysisFinviz(models.Model):
     """ Create the Stock Sentiment object """
     ticker = models.CharField(max_length=20)
     day = models.IntegerField(default=datetime.date.today, verbose_name='Days To Read')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class SentimentAnalysisReddit(models.Model):
+    """ Create the Stock Sentiment object """
+    client_id = models.CharField(max_length=20)
+    client_secret = models.CharField(max_length=50)
+    user_agent = models.CharField(max_length=20)
+    subreddits = models.CharField(max_length=100)
+    filter_selfpost = models.BooleanField(default=False, verbose_name='selfpost')
     created_at = models.DateTimeField(auto_now_add=True)
 
 class IntrinsicValuation(models.Model):

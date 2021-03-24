@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { AppBar, Tabs, Tab, TabPanel, Paper, Toolbar, IconButton, Typography, Button } from '@material-ui/core';
 import { Link } from "react-router-dom";
 import SAFinviz from './SAFinviz'
+import SAReddit from './SAReddit'
 
 export default function SentimentAnalysis () {
     const [tab, setTab] = React.useState(0);
@@ -25,8 +26,8 @@ export default function SentimentAnalysis () {
             </Tabs>
         </Paper>
         <hr></hr>
-        {tab === 0 && <SAFinviz></SAFinviz>}
-        {tab === 2 && <h1>{tab}</h1>}
+        {tab === 0 && <SAFinviz/>}
+        {tab === 1 && <SAReddit/>}
     </div>
     );
 }

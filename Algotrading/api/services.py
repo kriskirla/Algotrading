@@ -16,6 +16,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 import yahoo_fin.stock_info as si
+from praw import Reddit
 
 def PortfolioAnalyzerService(model):
     """ Get portfolio """
@@ -150,8 +151,8 @@ def StockForecastSVMService(model):
 
     return result
 
-def SentimentAnalysisService(model):
-    source = 'https://finviz.com/quote.ashx?t='
+def SentimentAnalysisFinvizService(model):
+    source = "https://finviz.com/quote.ashx?t="
     ticker = model.ticker
     day = model.day
 
@@ -223,6 +224,79 @@ def SentimentAnalysisService(model):
             "date": str(mean_scores.index[i]),
             "value": mean_scores[ticker][i]
         })
+    
+    result = {'Table': table, 'Graph': mean_graph}
+
+    return result
+
+def SentimentAnalysisRedditService(model):
+    # Login to Reddit agent
+    reddit = Reddit(client_id=model.client_id, client_secret=model.client_secret, user_agent=model.user_agent)
+    subreddits = reddit.subreddit(model.subreddits)
+    filter_selfpost = model.filter_selfpost
+    posts = []
+    # Get top 20 hot self post (Filters out all link posts)
+
+    def get_reddit_table(posts, post):
+        utc = dt.utcfromtimestamp(post.created_utc).strftime('%Y-%m-%d %H:%M:%S')
+        date = utc.split(' ')[0]
+        time = utc.split(' ')[1]
+        posts.append([date, time, f"r/{post.subreddit}", post.title, post.selftext, post.num_comments, post.score, post.upvote_ratio, 
+                        f"https://www.reddit.com/r/{post.subreddit}/comments/{post.id}"])
+        return 
+
+    if filter_selfpost:
+        while len(posts) <= 20:
+            for post in subreddits.hot(limit=100):
+                if post.is_self:
+                    get_reddit_table(posts, post)
+    else:
+        for post in subreddits.hot(limit=20):
+            get_reddit_table(posts, post)
+
+    df = pd.DataFrame(posts,columns=['Date', 'Time', 'Subreddit', 'Title', 'Body', 'Num_comments', 'Upvotes', 'Vote_ratio', 'Url'])
+    
+    # Instantiate the sentiment intensity analyzer
+    vader = SentimentIntensityAnalyzer()
+
+    # Apply Vader sentiment analysis to headlines
+    scores_title = df['Title'].apply(vader.polarity_scores).tolist()
+    scores_body = df['Body'].apply(vader.polarity_scores).tolist()
+    scores_df_title = pd.DataFrame(scores_title, columns=['compound', 'neg', 'neu', 'pos'])
+    scores_df_title.columns = ['comp_t', 'neg_t', 'neu_t', 'pos_t']
+    scores_df_body = pd.DataFrame(scores_body, columns=['compound', 'neg', 'neu', 'pos'])
+    scores_df_body.columns = ['comp_b', 'neg_b', 'neu_b', 'pos_b']
+    scores_df = scores_df_title.join(scores_df_body)
+    df = df.join(scores_df, rsuffix='_right')
+    df['Date'] = pd.to_datetime(df['Date'])
+    df.set_index('Date', inplace=True)
+
+    # Group the scores by ticker and date
+    mean_scores = df.groupby(by=['Subreddit', 'Date']).mean()
+    mean_scores = mean_scores.unstack()
+    mean_scores_title = mean_scores.xs('comp_t', axis="columns").transpose()
+    mean_scores_body = mean_scores.xs('comp_b', axis="columns").transpose()
+
+    # Gather info to output to frontend
+    table = []
+    mean_graph = []
+
+    # for i in range(0, len(df.index)):
+    #     table.append([
+    #         f"{df.index[i]} {df['Time'][i]}",
+    #         df['Headline'][i],
+    #         df['neg'][i],
+    #         df['neu'][i],
+    #         df['pos'][i],
+    #         df['compound'][i],
+    #         df['URL'][i],
+    #     ])
+    
+    # for i in range(0, len(mean_scores.index)):
+    #     mean_graph.append({
+    #         "date": str(mean_scores.index[i]),
+    #         "value": mean_scores[ticker][i]
+    #     })
     
     result = {'Table': table, 'Graph': mean_graph}
 
